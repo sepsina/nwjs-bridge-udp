@@ -1,0 +1,30 @@
+<div id="dlg-head"
+     cdkDrag
+     cdkDragRootElement=".cdk-overlay-pane"
+     cdkDragBoundary=".cdk-overlay-container">
+    <div id="edit-title" cdkDragHandle>
+        {{selAttr.name}}
+    </div>
+    <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<div id="graph_cont">
+    <canvas baseChart
+        [type]="'line'"
+        [data]="lineChartData"
+        [options]="lineChartOptions"
+        [legend]="lineChartLegend">
+    </canvas>
+    <div id="x-axe">
+        <div>
+            00:00:00
+        </div>
+        <div>
+            {{duration}}
+        </div>
+
+    </div>
+</div>
+

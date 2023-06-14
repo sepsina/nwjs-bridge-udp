@@ -258,4 +258,34 @@
     position:   fixed;
 }
 
+.ctx-menu {
+    display: inline-flex;
+    flex-direction: column;
+    background-color: rgb(255, 255, 255);
+    border: solid 1px rgb(220, 220, 220);
+}
+.ctx-menu-item {
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+
+    user-select: none;
+    min-width: 64px;
+    line-height: 36px;
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex: 1;
+}
+.ctx-menu-item:focus {
+    outline: 0px solid transparent;
+  }
+.ctx-menu-item:hover {
+    background-color: rgb(208, 208, 208);
+}
+.ctx-menu-item:active {
+    background-color: rgb(170, 170, 170);
+}
 

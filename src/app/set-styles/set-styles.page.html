@@ -3,8 +3,11 @@
      cdkDragRootElement=".cdk-overlay-pane"
      cdkDragBoundary=".cdk-overlay-container">
     <div id="edit-title" cdkDragHandle>
-        edit
+        {{selAttr.name}}
     </div>
+    <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
 </div>
 
 <div id="testCont">
@@ -13,38 +16,8 @@
     </div>
 </div>
 <div id="dlg-cont">
-    <div class="cards-common" id="name-card">
-        <mat-form-field class="form-field">
-            <input matInput
-                   type="text"
-                   placeholder="attr name"
-                   [formControl]="nameFormCtrl">
-            <mat-hint align="end">attribute name</mat-hint>
-            <mat-error *ngIf="nameFormCtrl.invalid">{{nameErr()}}</mat-error>
-        </mat-form-field>
-    </div>
-    <div class="cards-common" id="offset-card" *ngIf="selAttr.isSensor">
-        <mat-form-field id="units-sel" *ngIf="hasUnits">
-            <mat-label>units</mat-label>
-            <mat-select [formControl]="unitsCtrl"
-                        (selectionChange)="unitsChanged($event)">
-                <mat-option *ngFor="let unit of unitSel" [value]="unit">
-                    {{unit.name}}
-                </mat-option>
-            </mat-select>
-            <mat-error *ngIf="unitsCtrl.hasError('required')">choose units</mat-error>
-        </mat-form-field>
-        <mat-form-field class="form-field">
-            <input matInput
-                   type="number"
-                   placeholder="offset"
-                   [formControl]="offsetFormCtrl">
-            <mat-hint align="end">value correction</mat-hint>
-            <mat-error *ngIf="offsetFormCtrl.invalid">{{offsetErr()}}</mat-error>
-        </mat-form-field>
-    </div>
     <div class="cards-common" id="styles-card">
-        <mat-form-field>
+         <mat-form-field>
             <input matInput
                    type="text"
                    placeholder="color"
@@ -153,9 +126,6 @@
     </div>
 </div>
 <div class="set-actions">
-    <div>
-        <button mat-stroked-button (click)="close()">Close</button>
-    </div>
     <div>
         <button mat-stroked-button (click)="save()" [disabled]="!isValid()">Save</button>
     </div>

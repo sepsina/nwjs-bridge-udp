@@ -1,0 +1,55 @@
+#dlg-head {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: stretch;
+    background: #e6e6e6;
+    padding: 3px;
+    gap:5px;
+}
+
+#ssr-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 6px;
+    user-select: none;
+    cursor: move;
+    font-size: 16px;
+    flex: 1 1 100%;
+}
+
+#dlg-frame {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 10px;
+    margin: 10px;
+    overflow-y: auto;
+}
+
+#buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 10px;
+    margin: 10px;
+}
+
+#off-button {
+    width: 30%;
+    font-size: 16px;
+}
+
+#toggle-button {
+    flex: 1 1 100%;
+    font-size: 16px;
+}
+
+#on-button {
+    width: 30%;
+    font-size: 16px;
+}

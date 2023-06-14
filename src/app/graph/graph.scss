@@ -1,0 +1,44 @@
+#dlg-head {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: stretch;
+  background: #e8e8e8;
+  padding: 3px;
+  gap:5px;
+}
+
+#edit-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 6px;
+  user-select: none;
+  cursor: move;
+  font-size: 18px;
+  flex: 1 1 100%;
+}
+
+#graph_cont {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 20px;
+    //padding-right: 6px;
+    //border: 1px solid lightgrey;
+    border: 1px solid lightgrey;
+    border-radius: 6px;
+    margin: 10px;
+    //gap: 10px;
+}
+
+#x-axe {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    user-select: none;
+    font-size: 15px;
+    color: gray;
+  }

@@ -1,0 +1,32 @@
+<div id="dlg-head"
+     cdkDrag
+     cdkDragRootElement=".cdk-overlay-pane"
+     cdkDragBoundary=".cdk-overlay-container">
+    <div id="ssr-title" cdkDragHandle>
+        {{dlgData.attr.name}}
+    </div>
+    <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<div id="dlg-frame">
+    <div id="buttons">
+        <button mat-stroked-button
+            id="off-button"
+            (click)="setActuatorOff()">
+            off
+        </button>
+        <button mat-stroked-button
+                id="toggle-button"
+                (click)="toggleActuator()">
+            <mat-icon>shuffle</mat-icon>
+            toggle
+        </button>
+        <button mat-stroked-button
+            id="on-button"
+            (click)="setActuatorOn()">
+            on
+        </button>
+    </div>
+</div>

@@ -73,6 +73,14 @@ export class UtilsService {
         return `<${hours}:${minutes}:${seconds}>`;
     }
 
+    public secToTime(sec: number) {
+        const hours = (Math.floor(sec / 3600)).toString(10).padStart(2, '0');
+        sec %= 3600;
+        const minutes = (Math.floor(sec / 60)).toString(10).padStart(2, '0');
+        const seconds = (sec % 60).toString(10).padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+    }
+
     public strToByteArr(str: string): number[] {
         let len = str.length;
         let strVal = str;

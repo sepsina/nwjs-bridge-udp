@@ -31,17 +31,9 @@ export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
     maxPaddingLeft = 20;
 
     //formGroup: FormGroup;
-    name: string;
     style = {} as gIF.ngStyle_t;
-    valCorr = {} as gIF.valCorr_t;
     selAttr: gIF.hostedAttr_t;
 
-    hasUnits = false;
-    unitSel = [];
-    unitsCtrl = new FormControl('', Validators.required);
-
-    nameFormCtrl: FormControl;
-    offsetFormCtrl: FormControl;
     colorFormCtrl: FormControl;
     bgColorFormCtrl: FormControl;
     fontSizeFormCtrl: FormControl;
@@ -85,26 +77,9 @@ export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
         this.renderer.setStyle(this.testEl, 'paddingRight', `${this.selAttr.style.paddingRight}px`);
         this.renderer.setStyle(this.testEl, 'paddingBottom', `${this.selAttr.style.paddingBottom}px`);
         this.renderer.setStyle(this.testEl, 'paddingLeft', `${this.selAttr.style.paddingLeft}px`);
-        /*
-        this.testView.nativeElement.style.color = this.selAttr.style.color;
-        this.testView.nativeElement.style.backgroundColor = this.selAttr.style.bgColor;
-        this.testView.nativeElement.style.fontSize = `${this.selAttr.style.fontSize}px`;
-
-        this.testView.nativeElement.style.borderColor = this.selAttr.style.borderColor;
-        this.testView.nativeElement.style.borderWidth = `${this.selAttr.style.borderWidth}px`;
-        this.testView.nativeElement.style.borderStyle = this.selAttr.style.borderStyle;
-        this.testView.nativeElement.style.borderRadius = `${this.selAttr.style.borderRadius}px`;
-
-        this.testView.nativeElement.style.paddingTop = `${this.selAttr.style.paddingTop}px`;
-        this.testView.nativeElement.style.paddingRight = `${this.selAttr.style.paddingRight}px`;
-        this.testView.nativeElement.style.paddingBottom = `${this.selAttr.style.paddingBottom}px`;
-        this.testView.nativeElement.style.paddingLeft = `${this.selAttr.style.paddingLeft}px`;
-        */
     }
 
     ngOnInit() {
-        this.name = this.selAttr.name;
-        this.valCorr = this.selAttr.valCorr;
         this.style.color = this.selAttr.style.color;
         this.style.bgColor = this.selAttr.style.bgColor;
         this.style.fontSize = this.selAttr.style.fontSize;
@@ -118,13 +93,6 @@ export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
         this.style.paddingRight = this.selAttr.style.paddingRight;
         this.style.paddingBottom = this.selAttr.style.paddingBottom;
         this.style.paddingLeft = this.selAttr.style.paddingLeft;
-
-        this.nameFormCtrl = new FormControl(
-            this.name, [Validators.required]
-        );
-        this.offsetFormCtrl = new FormControl(
-            this.valCorr.offset, [Validators.required]
-        );
 
         // color
         this.colorFormCtrl = new FormControl(
@@ -313,124 +281,9 @@ export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
         });
         this.subscription.add(paddingLeftSubscription);
 
-        /*
-        this.formGroup = new FormGroup({
-            name: new FormControl(
-                this.name,
-                [
-                    Validators.required
-                ]
-            ),
-            offset: new FormControl(
-                this.valCorr.offset,
-                [
-                    Validators.required
-                ]
-            ),
-            color: new FormControl(
-                this.style.color,
-                [
-                    Validators.required
-                ]
-            ),
-            bgColor: new FormControl(
-                this.style.bgColor,
-                [
-                    Validators.required
-                ]
-            ),
-            fontSize: new FormControl(
-                this.style.fontSize,
-                [
-                    Validators.required,
-                    Validators.max(this.maxFontSize)
-                ]
-            ),
-            borderColor: new FormControl(
-                this.style.borderColor,
-                [
-                    Validators.required
-                ]
-            ),
-            borderWidth: new FormControl(
-                this.style.borderWidth,
-                [
-                    Validators.required,
-                    Validators.max(this.maxBorderWidth)
-                ]
-            ),
-            borderStyle: new FormControl(
-                this.style.borderStyle,
-                [
-                    Validators.required
-                ]
-            ),
-            borderRadius: new FormControl(
-                this.style.borderRadius,
-                [
-                    Validators.required,
-                    Validators.max(this.maxBorderRadius)
-                ]
-            ),
-            paddingTop: new FormControl(
-                this.style.paddingTop,
-                [
-                    Validators.required,
-                    Validators.max(this.maxPaddingTop)
-                ]
-            ),
-            paddingRight: new FormControl(
-                this.style.paddingRight,
-                [
-                    Validators.required,
-                    Validators.max(this.maxPaddingRight)
-                ]
-            ),
-            paddingBottom: new FormControl(
-                this.style.paddingBottom,
-                [
-                    Validators.required,
-                    Validators.max(this.maxPaddingBottom)
-                ]
-            ),
-            paddingLeft: new FormControl(
-                this.style.paddingLeft,
-                [
-                    Validators.required,
-                    Validators.max(this.maxPaddingLeft)
-                ]
-            ),
-        });
-        */
-
-        switch(this.selAttr.clusterID){
-            case gConst.CLUSTER_ID_MS_TEMPERATURE_MEASUREMENT: {
-                this.hasUnits = true;
-                this.unitSel.push({name: 'degC', unit: gConst.DEG_C});
-                this.unitSel.push({name: 'degF', unit: gConst.DEG_F});
-                this.unitsCtrl.setValue(this.unitSel[0]);
-                if(this.selAttr.valCorr.units == gConst.DEG_F){
-                    this.unitsCtrl.setValue(this.unitSel[1]);
-                }
-                break;
-            }
-            case gConst.CLUSTER_ID_MS_PRESSURE_MEASUREMENT: {
-                this.hasUnits = true;
-                this.unitSel.push({name: 'mBar', unit: gConst.M_BAR});
-                this.unitSel.push({name: 'inHg', unit: gConst.IN_HG});
-                this.unitsCtrl.setValue(this.unitSel[0]);
-                if(this.selAttr.valCorr.units == gConst.IN_HG){
-                    this.unitsCtrl.setValue(this.unitSel[1]);
-                }
-                break;
-            }
-        }
     }
 
     async save() {
-        this.name = this.nameFormCtrl.value;
-        this.valCorr.units = (this.unitsCtrl.value as any).unit;
-        this.valCorr.offset = this.offsetFormCtrl.value;
         this.style.color = this.colorFormCtrl.value;
         this.style.bgColor = this.bgColorFormCtrl.value;
         this.style.fontSize = this.fontSizeFormCtrl.value;
@@ -443,10 +296,8 @@ export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
         this.style.paddingBottom = this.paddingBottomFormCtrl.value;
         this.style.paddingLeft = this.paddingLeftFormCtrl.value;
 
-        await this.storage.setAttrNameAndStyle(this.name,
-                                               this.style,
-                                               this.valCorr,
-                                               this.keyVal);
+        await this.storage.setAttrStyle(this.style,
+                                        this.keyVal);
         this.dialogRef.close();
     }
 
@@ -454,16 +305,6 @@ export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
         this.dialogRef.close();
     }
 
-    nameErr() {
-        if(this.nameFormCtrl.hasError('required')){
-            return 'You must enter a value';
-        }
-    }
-    offsetErr() {
-        if(this.offsetFormCtrl.hasError('required')){
-            return 'You must enter a value';
-        }
-    }
     colorErr() {
         if(this.colorFormCtrl.hasError('required')){
             return 'You must enter a value';
@@ -561,42 +402,7 @@ export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
             return `padding left must be less than ${this.maxPaddingLeft}`;
         }
     }
-    /*
-    colorChange(event){
-        this.testView.nativeElement.style.color = event.target.value;
-    }
 
-    bgColorChange(event){
-        this.testView.nativeElement.style.backgroundColor = event.target.value;
-    }
-    fontSizeChange(event){
-        this.testView.nativeElement.style.fontSize = `${event.target.value}px`;
-    }
-    borderColorChange(event){
-        this.testView.nativeElement.style.borderColor = event.target.value;
-    }
-    borderWidthChange(event){
-        this.testView.nativeElement.style.borderWidth = `${event.target.value}px`;
-    }
-    borderStyleChange(event){
-        this.testView.nativeElement.style.borderStyle = event.target.value;
-    }
-    borderRadiusChange(event){
-        this.testView.nativeElement.style.borderRadius = `${event.target.value}px`;
-    }
-    paddingTopChange(event){
-        this.testView.nativeElement.style.paddingTop = `${event.target.value}px`;
-    }
-    paddingRightChange(event){
-        this.testView.nativeElement.style.paddingRight = `${event.target.value}px`;
-    }
-    paddingBottomChange(event){
-        this.testView.nativeElement.style.paddingBottom = `${event.target.value}px`;
-    }
-    paddingLeftChange(event){
-        this.testView.nativeElement.style.paddingLeft = `${event.target.value}px`;
-    }
-    */
     /***********************************************************************************************
      * @fn          unitsChanged
      *
@@ -614,12 +420,7 @@ export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
      *
      */
     isValid(){
-        if(this.nameFormCtrl.invalid){
-            return false;
-        }
-        if(this.offsetFormCtrl.invalid){
-            return false;
-        }
+
         if(this.colorFormCtrl.invalid){
             return false;
         }

@@ -51,6 +51,84 @@ export class StorageService {
     }
 
     /***********************************************************************************************
+     * fn          setAttrName
+     *
+     * brief
+     *
+     */
+    setAttrName(name: string,
+                keyVal: any): gIF.storedAttr_t {
+        let key: string = keyVal.key;
+        let selAttr: gIF.hostedAttr_t = keyVal.value;
+        let storedAttr = {} as gIF.storedAttr_t;
+
+        storedAttr.attrName = name;
+        storedAttr.pos = selAttr.pos;
+        storedAttr.style = selAttr.style;
+        storedAttr.valCorr = selAttr.valCorr;
+
+        localStorage.setItem(key, JSON.stringify(storedAttr));
+
+        selAttr.name = name;
+
+        this.nvAttrMap.set(key, storedAttr);
+
+        return storedAttr;
+    }
+
+    /***********************************************************************************************
+     * fn          setAttrStyle
+     *
+     * brief
+     *
+     */
+    setAttrStyle(style: gIF.ngStyle_t,
+                 keyVal: any): gIF.storedAttr_t {
+        let key: string = keyVal.key;
+        let selAttr: gIF.hostedAttr_t = keyVal.value;
+        let storedAttr = {} as gIF.storedAttr_t;
+
+        storedAttr.attrName = selAttr.name;
+        storedAttr.pos = selAttr.pos;
+        storedAttr.style = style;
+        storedAttr.valCorr = selAttr.valCorr;
+
+        localStorage.setItem(key, JSON.stringify(storedAttr));
+
+        selAttr.style = style;
+
+        this.nvAttrMap.set(key, storedAttr);
+
+        return storedAttr;
+    }
+
+    /***********************************************************************************************
+     * fn          setAttrCorr
+     *
+     * brief
+     *
+     */
+    setAttrCorr(valCorr: gIF.valCorr_t,
+                keyVal: any): gIF.storedAttr_t {
+        let key: string = keyVal.key;
+        let selAttr: gIF.hostedAttr_t = keyVal.value;
+        let storedAttr = {} as gIF.storedAttr_t;
+
+        storedAttr.attrName = selAttr.name;
+        storedAttr.pos = selAttr.pos;
+        storedAttr.style = selAttr.style;
+        storedAttr.valCorr = valCorr;
+
+        localStorage.setItem(key, JSON.stringify(storedAttr));
+
+        selAttr.valCorr = valCorr;
+
+        this.nvAttrMap.set(key, storedAttr);
+
+        return storedAttr;
+    }
+
+    /***********************************************************************************************
      * fn          setAttrNameAndStyle
      *
      * brief

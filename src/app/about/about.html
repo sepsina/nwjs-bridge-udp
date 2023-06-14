@@ -1,0 +1,21 @@
+<div id="dlg-head"
+     cdkDrag
+     cdkDragRootElement=".cdk-overlay-pane"
+     cdkDragBoundary=".cdk-overlay-container">
+    <div id="about-title" cdkDragHandle>
+        {{dlgData.attr.name}}
+    </div>
+    <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<div id="dlg-frame">
+    <div id="details" class="app-card">
+        <div id="logList">
+            <div *ngFor="let rec of recs" class="data-rec left-center">
+                {{ rec }}
+            </div>
+        </div>
+    </div>
+</div>

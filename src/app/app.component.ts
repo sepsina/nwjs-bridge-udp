@@ -23,6 +23,11 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, of, throwError } from 'rxjs';
 import { ShowLogs } from './logs/show-logs';
+import { About } from './about/about';
+import { SSR } from './ssr/ssr';
+import { SetName } from './set-name/set-name';
+import { Graph } from './graph/graph';
+import { SetCorr } from './set-corr/set-corr';
 
 const DUMMY_SCROLL = '- scroll -';
 const dumyScroll: gIF.scroll_t = {
@@ -71,6 +76,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     progressFlag = false;
     waitMsg = 'wait';
     msgIdx = 0;
+
+    selAttr = {} as any;
+    ctrlFlag = false;
+    graphFlag = false;
+    corrFlag = false;
+
 
     constructor(private events: EventsService,
                 private serialLink: SerialLinkService,
@@ -354,6 +365,87 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     /***********************************************************************************************
+     * @fn          setName
+     *
+     * @brief
+     *
+     */
+    setName(keyVal: any) {
+
+        this.startWait();
+        setTimeout(()=>{
+            const dialogConfig = new MatDialogConfig();
+            dialogConfig.data = keyVal;
+            dialogConfig.width = '350px';
+            dialogConfig.autoFocus = false;
+            dialogConfig.disableClose = true;
+            dialogConfig.panelClass = 'set-name-container';
+            dialogConfig.restoreFocus = false;
+            //dialogConfig.enterAnimationDuration = '0ms';
+            //dialogConfig.exitAnimationDuration = '0ms'
+
+            const dlgRef = this.matDialog.open(SetName, dialogConfig);
+            dlgRef.afterOpened().subscribe(()=>{
+                this.progressFlag = false;
+            });
+        }, 10);
+    }
+
+    /***********************************************************************************************
+     * @fn          setCorr
+     *
+     * @brief
+     *
+     */
+    setCorr(keyVal: any) {
+
+        this.startWait();
+        setTimeout(()=>{
+            const dialogConfig = new MatDialogConfig();
+            dialogConfig.data = keyVal;
+            dialogConfig.width = '350px';
+            dialogConfig.autoFocus = false;
+            dialogConfig.disableClose = true;
+            dialogConfig.panelClass = 'set-corr-container';
+            dialogConfig.restoreFocus = false;
+            //dialogConfig.enterAnimationDuration = '0ms';
+            //dialogConfig.exitAnimationDuration = '0ms'
+
+            const dlgRef = this.matDialog.open(SetCorr, dialogConfig);
+            dlgRef.afterOpened().subscribe(()=>{
+                this.progressFlag = false;
+            });
+        }, 10);
+    }
+
+    /***********************************************************************************************
+     * @fn          graph
+     *
+     * @brief
+     *
+     */
+    graph(keyVal: any) {
+
+        this.startWait();
+        setTimeout(()=>{
+            const dialogConfig = new MatDialogConfig();
+            dialogConfig.data = keyVal;
+            dialogConfig.width = '50%';
+            dialogConfig.autoFocus = false;
+            dialogConfig.disableClose = true;
+            dialogConfig.panelClass = 'graph-container';
+            dialogConfig.restoreFocus = false;
+            //dialogConfig.enterAnimationDuration = '0ms';
+            //dialogConfig.exitAnimationDuration = '0ms'
+
+            const dlgRef = this.matDialog.open(Graph, dialogConfig);
+            dlgRef.afterOpened().subscribe(()=>{
+                this.progressFlag = false;
+            });
+        }, 10);
+    }
+
+    /***********************************************************************************************
      * @fn          onEditScrollsClick
      *
      * @brief
@@ -495,6 +587,63 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             dialogConfig.restoreFocus = false;
 
             const dlgRef = this.matDialog.open(ShowLogs, dialogConfig);
+            dlgRef.afterOpened().subscribe(()=>{
+                this.progressFlag = false;
+            });
+        }, 10);
+    }
+
+    /***********************************************************************************************
+     * @fn          showAbout
+     *
+     * @brief
+     *
+     */
+    showAbout() {
+
+        this.startWait();
+        setTimeout(()=>{
+            const dlgData = {
+                attr: this.selAttr.value,
+                partMap: this.partMap
+            };
+            const dialogConfig = new MatDialogConfig();
+            dialogConfig.data = dlgData;
+            dialogConfig.width = '40%';
+            dialogConfig.autoFocus = false;
+            dialogConfig.disableClose = true;
+            dialogConfig.panelClass = 'show-about-container';
+            dialogConfig.restoreFocus = false;
+
+            const dlgRef = this.matDialog.open(About, dialogConfig);
+            dlgRef.afterOpened().subscribe(()=>{
+                this.progressFlag = false;
+            });
+        }, 10);
+    }
+
+    /***********************************************************************************************
+     * @fn          showSSR
+     *
+     * @brief
+     *
+     */
+    showSSR() {
+
+        this.startWait();
+        setTimeout(()=>{
+            const dlgData = {
+                attr: this.selAttr.value
+            };
+            const dialogConfig = new MatDialogConfig();
+            dialogConfig.data = dlgData;
+            dialogConfig.width = '40%';
+            dialogConfig.autoFocus = false;
+            dialogConfig.disableClose = true;
+            dialogConfig.panelClass = 'show-ssr-container';
+            dialogConfig.restoreFocus = false;
+
+            const dlgRef = this.matDialog.open(SSR, dialogConfig);
             dlgRef.afterOpened().subscribe(()=>{
                 this.progressFlag = false;
             });
@@ -672,6 +821,36 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             setTimeout(() => {
                 this.incrWait()
             }, 250);
+        }
+    }
+
+    /***********************************************************************************************
+     * fn          setSelAttr
+     *
+     * brief
+     *
+     */
+    setSelAttr(keyVal: any){
+
+        this.selAttr = keyVal;
+        const attrVal: gIF.hostedAttr_t = keyVal.value;
+        this.ctrlFlag = false;
+        this.corrFlag = false;
+        switch(attrVal.partNum){
+            case gConst.ACUATOR_010_ON_OFF:
+            case gConst.SSR_009_RELAY: {
+                this.ctrlFlag = true;
+                break;
+            }
+            case gConst.HTU21D_005_T:
+            case gConst.HTU21D_005_RH: {
+                this.corrFlag = true;
+                break;
+            }
+        }
+        this.graphFlag = false;
+        if(attrVal.attrVals.length > 1){
+            this.graphFlag = true;
         }
     }
 

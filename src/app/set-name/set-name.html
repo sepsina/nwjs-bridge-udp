@@ -1,0 +1,27 @@
+<div id="dlg-head"
+     cdkDrag
+     cdkDragRootElement=".cdk-overlay-pane"
+     cdkDragBoundary=".cdk-overlay-container">
+    <div id="edit-title" cdkDragHandle>
+        {{name}}
+    </div>
+    <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<mat-form-field class="form-field">
+    <input matInput
+            type="text"
+            placeholder="attr name"
+            [formControl]="nameFormCtrl">
+    <mat-hint align="end">attribute name</mat-hint>
+    <mat-error *ngIf="nameFormCtrl.invalid">{{nameErr()}}</mat-error>
+</mat-form-field>
+
+<div class="set-actions">
+    <div>
+        <button mat-stroked-button (click)="save()" [disabled]="!isValid()">Save</button>
+    </div>
+</div>
+

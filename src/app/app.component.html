@@ -1,25 +1,16 @@
 <div class="all-app">
     <div id="toolbar-frame">
-        <!-- <div id="scroll-buttons-frame"> -->
-            <!-- <div id="scroll-label">scrolls</div>
-            <div *ngFor="let scroll of scrolls; let i = index" >
-                <button mat-stroked-button (click)="onScroll(i)">
+        <div id="app-title">
+            bridge
+        </div>
+        <div id="scrollSel">
+            <mat-select (selectionChange)="scrollSelChange($event)"
+                        [(value)]="selScroll">
+                <mat-option *ngFor="let scroll of scrolls" [value]="scroll">
                     {{scroll.name}}
-                </button>
-            </div> -->
-            <div id="app-title">
-                bridge
-            </div>
-            <div id="scrollSel">
-                <mat-select (selectionChange)="scrollSelChange($event)"
-                            [(value)]="selScroll">
-                    <mat-option *ngFor="let scroll of scrolls" [value]="scroll">
-                        {{scroll.name}}
-                    </mat-option>
-                </mat-select>
-            </div>
-        <!-- </div> -->
-
+                </mat-option>
+            </mat-select>
+        </div>
     </div>
     <div id="main-container">
         <div id="side-bar">
@@ -33,11 +24,6 @@
                     (click)="editBinds()">
                 <mat-icon fontSet="material-icons-round">link</mat-icon>
             </button>
-            <!-- <button id="edit-dns-button"
-                    mat-button
-                    (click)="setDNS()">
-                <mat-icon fontSet="material-icons-round">dns</mat-icon>
-            </button> -->
             <button id="edit-thermostats-button"
                     mat-button
                     (click)="editThermostats()">
@@ -53,31 +39,19 @@
             <div id="floor-plan" #floorPlanRef resizeObserver (resize)="onResize($event)">
                 <div #containerRef id="containerID">
                     <div *ngFor="let attr of storage.attrMap | keyvalue;"
-                        class="attr"
-                        cdkDrag
-                        [cdkDragBoundary]="containerRef"
-                        (cdkDragEnded)="attr.value.drag=false; onDragEnded($event, attr)"
-                        (cdkDragStarted)="attr.value.drag=true; onDragStarted($event)"
-                        [cdkDragFreeDragPosition]="getAttrPosition(attr)"
-                        (mouseenter)="attr.value.isSel=true"
-                        (mouseleave)="attr.value.isSel=false"
-                        (mousedown)="attr.value.isSel=false">
+                         class="attr"
+                         cdkDrag
+                         [cdkDragBoundary]="containerRef"
+                         (cdkDragEnded)="attr.value.drag=false; onDragEnded($event, attr)"
+                         (cdkDragStarted)="attr.value.drag=true; onDragStarted($event)"
+                         [cdkDragFreeDragPosition]="getAttrPosition(attr)"
+                         (mouseenter)="setSelAttr(attr)">
                         <div cdkDragHandle
-                            class="attr-val centered"
-                            highlightSel
-                            [ngStyle]="getAttrStyle(attr)"
-                            matTooltip
-                            [matTooltipDisabled]="dragFlag"
-                            #attrToolTip='matTooltip'
-                            (mouseenter)="showTooltip(attrToolTip, attr.value)"
-                            (mouseleave)="attrToolTip.hide()"
-                            (mousedown)="attrToolTip.hide()">
+                             class="attr-val centered"
+                             highlightSel
+                             [ngStyle]="getAttrStyle(attr)"
+                             [cdkContextMenuTriggerFor]="ctx_menu">
                             {{attr.value.formatedVal}}
-                        </div>
-                        <div *ngIf="attr.value.isSel && !dragFlag"
-                            class="attr-edit centered"
-                            (mousedown)="setStyles(attr)">
-                            <mat-icon>settings</mat-icon>
                         </div>
                     </div>
                 </div>
@@ -91,5 +65,44 @@
             {{waitMsg}}
         </div>
     </div>
-
 </div>
+
+<ng-template #ctx_menu>
+    <div cdkMenu class="ctx-menu">
+        <button cdkMenuItem
+                class="ctx-menu-item"
+                (cdkMenuItemTriggered)="setName(selAttr)">
+            Name
+        </button>
+        <button *ngIf="corrFlag"
+                cdkMenuItem
+                class="ctx-menu-item"
+                (cdkMenuItemTriggered)="setCorr(selAttr)">
+            Correction
+        </button>
+        <button cdkMenuItem
+                class="ctx-menu-item"
+                (cdkMenuItemTriggered)="setStyles(selAttr)">
+            Styles
+        </button>
+        <button *ngIf="ctrlFlag"
+                cdkMenuItem
+                class="ctx-menu-item"
+                (cdkMenuItemTriggered)="showSSR()">
+            On/Off
+        </button>
+        <button *ngIf="graphFlag"
+                cdkMenuItem
+                class="ctx-menu-item"
+                (cdkMenuItemTriggered)="graph(selAttr)">
+            Graph
+        </button>
+        <button cdkMenuItem
+                class="ctx-menu-item"
+                (cdkMenuItemTriggered)="showAbout()">
+            About
+        </button>
+    </div>
+</ng-template>
+
+
