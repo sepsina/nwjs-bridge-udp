@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, ElementRef, AfterViewInit, OnDestroy, Renderer2 } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ElementRef, AfterViewInit, OnDestroy, Renderer2, HostListener } from '@angular/core';
 import { SerialLinkService } from '../services/serial-link.service';
 import { StorageService } from '../services/storage.service';
 import { Validators, FormGroup, FormControl } from '@angular/forms';
@@ -16,6 +16,18 @@ import { debounceTime } from "rxjs/operators";
     styleUrls: ['./set-styles.page.scss'],
 })
 export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
+
+    @ViewChild('attrColor') attrColor: ElementRef;
+
+    @HostListener('document:keyup', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        switch(event.key){
+            case 'Escape': {
+                this.close();
+                break;
+            }
+        }
+    }
 
     @ViewChild('testView') testView: ElementRef;
     testEl: HTMLElement;
@@ -77,6 +89,11 @@ export class SetStyles implements OnInit, AfterViewInit, OnDestroy {
         this.renderer.setStyle(this.testEl, 'paddingRight', `${this.selAttr.style.paddingRight}px`);
         this.renderer.setStyle(this.testEl, 'paddingBottom', `${this.selAttr.style.paddingBottom}px`);
         this.renderer.setStyle(this.testEl, 'paddingLeft', `${this.selAttr.style.paddingLeft}px`);
+
+        setTimeout(() => {
+            this.attrColor.nativeElement.focus();
+            this.attrColor.nativeElement.select();
+        }, 0);
     }
 
     ngOnInit() {

@@ -15,6 +15,7 @@ html, body {
 
 * {
   font-family: appFont;
+  box-sizing: border-box;
 }
 
 body {
@@ -66,6 +67,7 @@ body {
 }
 
 .show-logs-container .mat-dialog-container {
+    //resize: horizontal;
     padding: 0;
 }
 
@@ -86,56 +88,57 @@ body {
 }
 
 .graph-container .mat-dialog-container {
+    //resize: horizontal;
     padding: 0;
 }
 
-.center-center{
+.center-center {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 }
-.left-center{
+.left-center {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
 }
-.right-center{
+.right-center {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
 }
 
-.app-card{
+.app-card {
   display: flex;
   flex-direction: column;
   border: solid black 1px;
   border-radius: 5px;
 }
-.app-card-toolbar{
+.app-card-toolbar {
   gap: 10px;
   font-size: 0.9em;
   border-bottom : solid 1px black;
-  //margin-top: 10px;
   padding: 8px;
 }
-.app-card-title{
+.app-card-title {
   flex: 1 1 auto;
   align-self: stretch;
-  //font-family: Verdana;
-  //font-size: 1.4em;
   font-size: 140%;
   padding-left: 10px;
 }
 
 // test
+/*
 ::-webkit-scrollbar {
     -webkit-appearance: none;
 }
+*/
 
 ::-webkit-scrollbar {
+    -webkit-appearance: none;
     width: 12px;
 }
 
@@ -146,7 +149,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background-color: #fff;
+    background-color: transparent;
 }
 
 .mat-select-trigger {
@@ -154,6 +157,7 @@ body {
 }
 .mat-select-value {
     text-align: right;
+    padding-right: 5px;
 }
 /*
 .overflow-scroll {

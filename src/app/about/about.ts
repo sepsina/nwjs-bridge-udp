@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, AfterViewInit, NgZone } from '@angular/core';
+import { Component, Inject, OnInit, AfterViewInit, NgZone, HostListener } from '@angular/core';
 import { EventsService } from '../services/events.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UtilsService } from '../services/utils.service';
@@ -12,6 +12,16 @@ import * as gIF from '../gIF'
     styleUrls: ['./about.css']
 })
 export class About implements OnInit, AfterViewInit {
+
+    @HostListener('document:keyup', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        switch(event.key){
+            case 'Escape': {
+                this.close();
+                break;
+            }
+        }
+    }
 
     recs: string[] = [];
 

@@ -1,4 +1,4 @@
-import { Component, Inject, NgZone, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, Inject, NgZone, AfterViewInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { SerialLinkService } from '../services/serial-link.service';
 import { StorageService } from '../services/storage.service';
 import { UtilsService } from '../services/utils.service';
@@ -24,6 +24,16 @@ export class EditBinds implements AfterViewInit {
 
     @ViewChild('bindBoxRef', {read: ElementRef, static:false}) bindBoxRef: ElementRef;
     @ViewChild('usedWrapRef', {read: ElementRef, static:false}) wrapRef: ElementRef;
+
+    @HostListener('document:keyup', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        switch(event.key){
+            case 'Escape': {
+                this.close();
+                break;
+            }
+        }
+    }
 
     allBindSrc: gIF.hostedBind_t[] = [];
     bindSrc = {} as gIF.hostedBind_t;

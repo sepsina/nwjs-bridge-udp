@@ -128,8 +128,7 @@ export class SerialLinkService implements OnDestroy {
                         newVal.pos = {x: 0, y: 0};
                         newVal.name = 'no name';
                         newVal.style = gConst.NG_STYLE;
-                        newVal.valCorr = {units: gConst.DEG_C,
-                                          slope: 1,
+                        newVal.valCorr = {units: spec.units,
                                           offset: 0};
                     }
                     newVal.ip = attrSet.ip;
@@ -297,21 +296,17 @@ export class SerialLinkService implements OnDestroy {
      * brief
      *
      */
-    private corrVal(val: number, corr: gIF.valCorr_t) {
+    corrVal(val: number, corr: gIF.valCorr_t) {
+
+        let corrVal = val + corr.offset;
+
         switch(corr.units) {
             case gConst.DEG_F: {
-                val = (val * 9.0) / 5.0 + 32.0;
-                break;
-            }
-            case gConst.IN_HG: {
-                val = val / 33.864;
+                corrVal = (corrVal * 9.0) / 5.0 + 32.0;
                 break;
             }
         }
-        val *= corr.slope;
-        val += corr.offset;
-
-        return val;
+        return corrVal;
     }
 
     /***********************************************************************************************
@@ -374,6 +369,7 @@ export class SerialLinkService implements OnDestroy {
                 let temp = valsView.getInt16(idx, gConst.LE);
                 idx += 2;
                 temp /= 10.0;
+                let corrTemp = temp;
                 attrID = 0;
                 key = this.getKey(attrSet, attrID);
                 nvAttr = this.storage.nvAttrMap.get(key);
@@ -382,21 +378,21 @@ export class SerialLinkService implements OnDestroy {
                 if(nvAttr) {
                     attrName = nvAttr.attrName;
                     units = nvAttr.valCorr.units;
-                    temp = this.corrVal(temp, nvAttr.valCorr);
+                    corrTemp = this.corrVal(temp, nvAttr.valCorr);
                     if(units == gConst.DEG_F) {
-                        formatedVal = `${temp.toFixed(1)} °F`;
+                        formatedVal = `${corrTemp.toFixed(1)} °F`;
                     }
                     else {
-                        formatedVal = `${temp.toFixed(1)} °C`;
+                        formatedVal = `${corrTemp.toFixed(1)} °C`;
                     }
                 }
                 else {
-                    formatedVal = `${temp.toFixed(1)} °C`;
+                    formatedVal = `${corrTemp.toFixed(1)} °C`;
                 }
                 setVals = {
                     name: attrName,
                     units: units,
-                    t_val: temp,
+                    t_val: corrTemp,
                 };
                 spec = {
                     attrID: attrID,
@@ -404,13 +400,14 @@ export class SerialLinkService implements OnDestroy {
                     isSensor: true,
                     hasHistory: true,
                     formatedVal: formatedVal,
+                    units: units,
                     timestamp: now,
                     attrVal: temp,
                 };
                 attrSpecs.push(spec);
 
                 const tempEvent = {} as gIF.tempEvent_t;
-                tempEvent.temp = temp;
+                tempEvent.temp = corrTemp;
                 tempEvent.extAddr = attrSet.extAddr;
                 tempEvent.endPoint = attrSet.endPoint;
 
@@ -422,24 +419,26 @@ export class SerialLinkService implements OnDestroy {
                 let rh = valsView.getUint16(idx, gConst.LE);
                 idx += 2;
                 rh /= 10.0;
+                let corrRH = rh;
                 attrID = 0;
                 key = this.getKey(attrSet, attrID);
                 nvAttr = this.storage.nvAttrMap.get(key);
                 attrName = '';
                 if(nvAttr) {
                     attrName = nvAttr.attrName;
-                    rh = this.corrVal(rh, nvAttr.valCorr);
+                    corrRH = this.corrVal(rh, nvAttr.valCorr);
                 }
                 setVals = {
                     name: attrName,
-                    rh_val: rh,
+                    rh_val: corrRH,
                 };
                 spec = {
                     attrID: attrID,
                     isVisible: true,
                     isSensor: true,
                     hasHistory: true,
-                    formatedVal: `${rh.toFixed(0)} %rh`,
+                    formatedVal: `${corrRH.toFixed(0)} %rh`,
+                    units: gConst.RH_UNIT,
                     timestamp: now,
                     attrVal: rh,
                 };
@@ -467,6 +466,7 @@ export class SerialLinkService implements OnDestroy {
                     isSensor: false,
                     hasHistory: false,
                     formatedVal: `${batVolt.toFixed(1)} V`,
+                    units: gConst.VOLT_UNIT,
                     timestamp: now,
                     attrVal: batVolt,
                 };
@@ -494,6 +494,7 @@ export class SerialLinkService implements OnDestroy {
                     isSensor: true,
                     hasHistory: true,
                     formatedVal: `${sh.toFixed(0)} %sh`,
+                    units: gConst.NO_UNIT,
                     timestamp: now,
                     attrVal: sh,
                 };
@@ -521,145 +522,7 @@ export class SerialLinkService implements OnDestroy {
                     isSensor: false,
                     hasHistory: false,
                     formatedVal: `${batVolt.toFixed(1)} V`,
-                    timestamp: now,
-                    attrVal: batVolt,
-                };
-                attrSpecs.push(spec);
-                break;
-            }
-
-            case gConst.BME280_007_T: {
-                idx = 0;
-                let temp = valsView.getInt16(idx, gConst.LE);
-                idx += 2;
-                temp /= 10.0;
-                attrID = 0;
-                key = this.getKey(attrSet, attrID);
-                nvAttr = this.storage.nvAttrMap.get(key);
-                attrName = '';
-                units = gConst.DEG_C;
-                if(nvAttr) {
-                    attrName = nvAttr.attrName;
-                    units = nvAttr.valCorr.units;
-                    temp = this.corrVal(temp, nvAttr.valCorr);
-                    if(units == gConst.DEG_F) {
-                        formatedVal = `${temp.toFixed(1)} °F`;
-                    }
-                    else {
-                        formatedVal = `${temp.toFixed(1)} °C`;
-                    }
-                }
-                else {
-                    formatedVal = `${temp.toFixed(1)} °C`;
-                }
-                setVals = {
-                    name: attrName,
-                    units: units,
-                    t_val: temp,
-                };
-                spec = {
-                    attrID: attrID,
-                    isVisible: true,
-                    isSensor: true,
-                    hasHistory: true,
-                    formatedVal: formatedVal,
-                    timestamp: now,
-                    attrVal: temp,
-                };
-                attrSpecs.push(spec);
-                break;
-            }
-            case gConst.BME280_007_RH: {
-                idx = 0;
-                let rh = valsView.getUint16(idx, gConst.LE);
-                idx += 2;
-                rh /= 10.0;
-                attrID = 0;
-                key = this.getKey(attrSet, attrID);
-                nvAttr = this.storage.nvAttrMap.get(key);
-                attrName = '';
-                if(nvAttr) {
-                    attrName = nvAttr.attrName;
-                    rh = this.corrVal(rh, nvAttr.valCorr);
-                }
-                setVals = {
-                    name: attrName,
-                    rh_val: rh,
-                };
-                spec = {
-                    attrID: attrID,
-                    isVisible: true,
-                    isSensor: true,
-                    hasHistory: true,
-                    formatedVal: `${rh.toFixed(0)} %rh`,
-                    timestamp: now,
-                    attrVal: rh,
-                };
-                attrSpecs.push(spec);
-                break;
-            }
-            case gConst.BME280_007_P: {
-                idx = 0;
-                let press = valsView.getInt16(idx, gConst.LE);
-                idx += 2;
-                press /= 10.0;
-                attrID = 0;
-                key = this.getKey(attrSet, attrID);
-                nvAttr = this.storage.nvAttrMap.get(key);
-                attrName = '';
-                units = gConst.M_BAR;
-                if(nvAttr) {
-                    attrName = nvAttr.attrName;
-                    units = nvAttr.valCorr.units;
-                    press = this.corrVal(press, nvAttr.valCorr);
-                    if(units == gConst.IN_HG) {
-                        formatedVal = `${press.toFixed(1)} mmHg`;
-                    }
-                    else {
-                        formatedVal = `${press.toFixed(1)} mBar`;
-                    }
-                }
-                else {
-                    formatedVal = `${press.toFixed(1)} mBar`;
-                }
-                setVals = {
-                    name: attrName,
-                    units: units,
-                    p_val: press,
-                };
-                spec = {
-                    attrID: attrID,
-                    isVisible: true,
-                    isSensor: true,
-                    hasHistory: true,
-                    formatedVal: formatedVal,
-                    timestamp: now,
-                    attrVal: press,
-                };
-                attrSpecs.push(spec);
-                break;
-            }
-            case gConst.BME280_007_BAT: {
-                idx = 0;
-                let batVolt = valsView.getUint8(idx++);
-                batVolt /= 10.0;
-                attrID = 0;
-                key = this.getKey(attrSet, attrID);
-                nvAttr = this.storage.nvAttrMap.get(key);
-                attrName = '';
-                if(nvAttr) {
-                    attrName = nvAttr.attrName;
-                }
-                setVals = {
-                    name: attrName,
-                    bat_volt: batVolt,
-                };
-                spec = {
-                    attrID: attrID,
-                    isVisible: true,
-                    isSensor: false,
-                    hasHistory: false,
-                    formatedVal: `${batVolt.toFixed(1)} V`,
+                    units: gConst.VOLT_UNIT,
                     timestamp: now,
                     attrVal: batVolt,
                 };
@@ -687,6 +550,7 @@ export class SerialLinkService implements OnDestroy {
                     isSensor: false,
                     hasHistory: true,
                     formatedVal: !!state ? 'on' : 'off',
+                    units: gConst.NO_UNIT,
                     timestamp: now,
                     attrVal: state,
                 };
@@ -719,6 +583,7 @@ export class SerialLinkService implements OnDestroy {
                     isSensor: false,
                     hasHistory: true,
                     formatedVal: formatedVal,
+                    units: gConst.NO_UNIT,
                     timestamp: now,
                     attrVal: state,
                 };
@@ -746,6 +611,7 @@ export class SerialLinkService implements OnDestroy {
                     isSensor: false,
                     hasHistory: false,
                     formatedVal: `${batVolt.toFixed(1)} V`,
+                    units: gConst.VOLT_UNIT,
                     timestamp: now,
                     attrVal: batVolt,
                 };
@@ -796,14 +662,6 @@ export class SerialLinkService implements OnDestroy {
             key[i] = dv.getUint8(i).toString(16);
         }
         return `set-${key.join('')}`;
-        /*
-        let key = `set-${params.shortAddr.toString(16).padStart(4, '0').toUpperCase()}`;
-        key += `:${params.endPoint.toString(16).padStart(2, '0').toUpperCase()}`;
-        key += `:${params.clusterID.toString(16).padStart(4, '0').toUpperCase()}`;
-        key += `:${params.attrSetID.toString(16).padStart(4, '0').toUpperCase()}`;
-
-        return key;
-        */
     }
 
     /***********************************************************************************************

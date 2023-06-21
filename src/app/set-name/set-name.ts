@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, AfterViewInit, NgZone, OnDestroy, ViewChild, ElementRef, HostListener, AfterContentInit } from '@angular/core';
 import { SerialLinkService } from '../services/serial-link.service';
 import { StorageService } from '../services/storage.service';
 import { Validators, FormControl } from '@angular/forms';
@@ -15,15 +15,17 @@ import * as gIF from '../gIF'
 })
 export class SetName implements OnInit, AfterViewInit, OnDestroy {
 
-    //selAttr: gIF.hostedAttr_t;
-    minFontSize = 5
-    maxFontSize = 50;
-    maxBorderWidth = 10;
-    maxBorderRadius = 20;
-    maxPaddingTop = 20;
-    maxPaddingRight = 20;
-    maxPaddingBottom = 20;
-    maxPaddingLeft = 20;
+    @ViewChild('attrName') attrName: ElementRef;
+
+    @HostListener('document:keyup', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        switch(event.key){
+            case 'Escape': {
+                this.close();
+                break;
+            }
+        }
+    }
 
     name: string;
     selAttr: gIF.hostedAttr_t;
@@ -34,6 +36,7 @@ export class SetName implements OnInit, AfterViewInit, OnDestroy {
                 @Inject(MAT_DIALOG_DATA) public keyVal: any,
                 public events: EventsService,
                 public serialLink: SerialLinkService,
+                public ngZone: NgZone,
                 public storage: StorageService) {
         this.selAttr = this.keyVal.value;
     }
@@ -43,12 +46,15 @@ export class SetName implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        // ---
+        setTimeout(() => {
+            this.attrName.nativeElement.focus();
+            this.attrName.nativeElement.select();
+        }, 0);
     }
 
     ngOnInit() {
-        this.name = this.selAttr.name;
 
+        this.name = this.selAttr.name;
         this.nameFormCtrl = new FormControl(
             this.name, [Validators.required]
         );

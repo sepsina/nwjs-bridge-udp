@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, AfterViewInit, NgZone } from '@angular/core';
+import { Component, Inject, OnInit, AfterViewInit, NgZone, HostListener } from '@angular/core';
 import { SerialLinkService } from '../services/serial-link.service';
 import { EventsService } from '../services/events.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -17,6 +17,16 @@ const TOGGLE = 2;
     styleUrls: ['./ssr.scss']
 })
 export class SSR implements OnInit, AfterViewInit {
+
+    @HostListener('document:keyup', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        switch(event.key){
+            case 'Escape': {
+                this.close();
+                break;
+            }
+        }
+    }
 
     recs: string[] = [];
 

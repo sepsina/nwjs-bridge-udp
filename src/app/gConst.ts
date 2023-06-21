@@ -63,12 +63,6 @@ export const SH_006_BASE = 600;
 export const SH_006_SH = 601;
 export const SH_006_BAT = 602;
 
-export const BME280_007_BASE = 700;
-export const BME280_007_T = 701;
-export const BME280_007_RH = 702;
-export const BME280_007_P = 703;
-export const BME280_007_BAT = 704;
-
 export const DBL_SW_008_BASE = 800;
 export const DBL_SW_008_PB_1 = 801;
 export const DBL_SW_008_PB_2 = 802;
@@ -97,10 +91,11 @@ export const RH_SENSORS = 0x0006;
 export const P_ATM_SENSORS = 0x0007;
 export const BAT_VOLTS = 0x0008;
 
+export const NO_UNIT = 0;
 export const DEG_C = 1;
 export const DEG_F = 2;
-export const M_BAR = 3;
-export const IN_HG = 4;
+export const RH_UNIT = 3;
+export const VOLT_UNIT = 4;
 
 //export const PUB_IP_KEY = 'public-ip';
 //export const FREE_DNS_KEY = 'free-dns';

@@ -82,6 +82,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     graphFlag = false;
     corrFlag = false;
 
+    footerTmo: any;
+    footerStatus = '';
+
 
     constructor(private events: EventsService,
                 private serialLink: SerialLinkService,
@@ -190,7 +193,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         bkgImg.onload = ()=>{
             this.bkgImgWidth = bkgImg.width;
             this.bkgImgHeight = bkgImg.height;
-            const el = this.containerRef.nativeElement;
+            //const el = this.containerRef.nativeElement;
+            const el = this.floorPlanRef.nativeElement;
             let divDim = el.getBoundingClientRect();
             this.imgDim.width = divDim.width;
             this.imgDim.height = Math.round((divDim.width / bkgImg.width) * bkgImg.height);
@@ -376,7 +380,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(()=>{
             const dialogConfig = new MatDialogConfig();
             dialogConfig.data = keyVal;
-            dialogConfig.width = '350px';
+            dialogConfig.width = '250px';
             dialogConfig.autoFocus = false;
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'set-name-container';
@@ -403,7 +407,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(()=>{
             const dialogConfig = new MatDialogConfig();
             dialogConfig.data = keyVal;
-            dialogConfig.width = '350px';
+            dialogConfig.width = '200px';
             dialogConfig.autoFocus = false;
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'set-corr-container';
@@ -430,7 +434,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(()=>{
             const dialogConfig = new MatDialogConfig();
             dialogConfig.data = keyVal;
-            dialogConfig.width = '50%';
+            dialogConfig.width = '70%';
             dialogConfig.autoFocus = false;
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'graph-container';
@@ -457,7 +461,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(()=>{
             const dlgData = {
                 scrolls: JSON.parse(JSON.stringify(this.scrolls)),
-                scrollRef: this.floorPlanRef.nativeElement,
+                scrollRef: this.containerRef.nativeElement,
                 imgDim: this.imgDim,
             };
             const dialogConfig = new MatDialogConfig();
@@ -697,7 +701,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                 const x = 0;
                 const y = (scroll.value.yPos * this.imgDim.height) / 100;
 
-                this.floorPlanRef.nativeElement.scrollTo({
+                this.containerRef.nativeElement.scrollTo({
                     top: y,
                     left: x,
                     behavior: 'smooth'
@@ -716,11 +720,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      *
      */
     onResize(event) {
+
         const rect = event.contentRect;
         console.log(`w: ${rect.width}, h: ${rect.height}`);
-
-        //this.scaleImgConteiner();
-        const el = this.containerRef.nativeElement;
+        const el = this.floorPlanRef.nativeElement;
 
         this.imgDim.width = rect.width;
         this.imgDim.height = Math.round((rect.width / this.bkgImgWidth) * this.bkgImgHeight);
@@ -852,6 +855,25 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         if(attrVal.attrVals.length > 1){
             this.graphFlag = true;
         }
+
+        let partDesc: gIF.part_t = this.partMap.get(attrVal.partNum);
+        this.footerStatus  = `${partDesc.part}`;
+        this.footerStatus += ` -> ${partDesc.devName}`;
+        this.footerStatus += ` @ ${this.utils.extToHex(attrVal.extAddr)}`;
+        clearTimeout(this.footerTmo);
+        this.footerTmo = setTimeout(()=>{
+            this.footerStatus = '';
+        }, 5000);
+    }
+
+    /***********************************************************************************************
+     * fn          mouseLeaveAttr
+     *
+     * brief
+     *
+     */
+    mouseLeaveAttr(keyVal: any){
+        this.footerStatus = '';
     }
 
 }

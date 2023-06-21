@@ -1,4 +1,4 @@
-import { Component, Inject, NgZone, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, Inject, NgZone, AfterViewInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { SerialLinkService } from '../services/serial-link.service';
 import { StorageService } from '../services/storage.service';
 import { UtilsService } from '../services/utils.service';
@@ -22,6 +22,16 @@ export class EditStats implements AfterViewInit {
 
     @ViewChild('onOffBoxRef', {read: ElementRef, static:false}) onOffBoxRef: ElementRef;
     @ViewChild('usedWrapRef', {read: ElementRef, static:false}) wrapRef: ElementRef;
+
+    @HostListener('document:keyup', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        switch(event.key){
+            case 'Escape': {
+                this.close();
+                break;
+            }
+        }
+    }
 
     thermostatDesc: gIF.descVal_t[] = [];
 

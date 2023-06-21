@@ -14,51 +14,48 @@
     </div>
     <div id="main-container">
         <div id="side-bar">
-            <button id="edit-scrolls-button"
+            <button class="side-button"
                     mat-button
                     (click)="onEditScrollsClick()">
                 <mat-icon fontSet="material-icons-round">swap_vert</mat-icon>
             </button>
-            <button id="edit-binds-button"
+            <button class="side-button"
                     mat-button
                     (click)="editBinds()">
                 <mat-icon fontSet="material-icons-round">link</mat-icon>
             </button>
-            <button id="edit-thermostats-button"
+            <button class="side-button"
                     mat-button
                     (click)="editThermostats()">
                 <mat-icon fontSet="material-icons-round">thermostat</mat-icon>
             </button>
-            <button id="show-logs-button"
+            <button class="side-button"
                     mat-button
                     (click)="showLogs()">
                 <mat-icon fontSet="material-icons-round">notes</mat-icon>
             </button>
         </div>
-        <div id="test">
+        <div id="plan-container" #containerRef>
             <div id="floor-plan" #floorPlanRef resizeObserver (resize)="onResize($event)">
-                <div #containerRef id="containerID">
-                    <div *ngFor="let attr of storage.attrMap | keyvalue;"
-                         class="attr"
-                         cdkDrag
-                         [cdkDragBoundary]="containerRef"
-                         (cdkDragEnded)="attr.value.drag=false; onDragEnded($event, attr)"
-                         (cdkDragStarted)="attr.value.drag=true; onDragStarted($event)"
-                         [cdkDragFreeDragPosition]="getAttrPosition(attr)"
-                         (mouseenter)="setSelAttr(attr)">
-                        <div cdkDragHandle
-                             class="attr-val centered"
-                             highlightSel
-                             [ngStyle]="getAttrStyle(attr)"
-                             [cdkContextMenuTriggerFor]="ctx_menu">
-                            {{attr.value.formatedVal}}
-                        </div>
-                    </div>
+                <div *ngFor="let attr of storage.attrMap | keyvalue;"
+                     class="attr"
+                     cdkDrag
+                     [cdkDragBoundary]="floorPlanRef"
+                     (cdkDragEnded)="attr.value.drag=false; onDragEnded($event, attr)"
+                     (cdkDragStarted)="attr.value.drag=true; onDragStarted($event)"
+                     [cdkDragFreeDragPosition]="getAttrPosition(attr)"
+                     (mouseenter)="setSelAttr(attr)"
+                     (mouseleave)="mouseLeaveAttr(attr)"
+                     highlightSel
+                     [ngStyle]="getAttrStyle(attr)"
+                     [cdkContextMenuTriggerFor]="ctx_menu">
+                        {{attr.value.formatedVal}}
                 </div>
             </div>
         </div>
     </div>
     <div class="footer">
+        {{footerStatus}}
     </div>
     <div class="overlay" *ngIf="progressFlag">
         <div class="center">

@@ -5,6 +5,9 @@
     <div id="scroll-title" cdkDragHandle>
         scrolls
     </div>
+    <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
 </div>
 
 <div id="dlg-frame">
@@ -56,12 +59,12 @@
 </div>
 
 <div class="edit-scrolls">
-    <div>
+    <!-- <div>
         <button mat-stroked-button
                 (click)="close()">
             Cancel
         </button>
-    </div>
+    </div> -->
     <div>
         <button mat-stroked-button
                 (click)="save()">

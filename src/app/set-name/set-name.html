@@ -12,9 +12,10 @@
 
 <mat-form-field class="form-field">
     <input matInput
-            type="text"
-            placeholder="attr name"
-            [formControl]="nameFormCtrl">
+           #attrName
+           type="text"
+           placeholder="attr name"
+           [formControl]="nameFormCtrl">
     <mat-hint align="end">attribute name</mat-hint>
     <mat-error *ngIf="nameFormCtrl.invalid">{{nameErr()}}</mat-error>
 </mat-form-field>

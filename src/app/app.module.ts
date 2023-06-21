@@ -27,6 +27,11 @@ import { AngularMaterialModule } from './angular-material/angular-material.modul
 import { CdkMenuModule } from '@angular/cdk/menu';
 import { NgChartsModule } from 'ng2-charts';
 
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldDefaultOptions } from '@angular/material/form-field';
+const matFormFieldDefaultOptions: MatFormFieldDefaultOptions = {
+    hideRequiredMarker: true
+  };
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -56,7 +61,11 @@ import { NgChartsModule } from 'ng2-charts';
         CdkMenuModule,
         NgChartsModule
     ],
-    providers: [],
+    providers: [
+        { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+          useValue: matFormFieldDefaultOptions
+        }
+    ],
     bootstrap: [AppComponent],
     entryComponents:[]
 })

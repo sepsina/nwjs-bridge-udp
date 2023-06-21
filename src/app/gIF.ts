@@ -54,6 +54,7 @@ export interface attrSpec_t {
     isSensor: boolean;
     hasHistory: boolean;
     formatedVal: string;
+    units: number;
     timestamp: number;
     attrVal: number;
 }
@@ -77,7 +78,7 @@ export interface ngStyle_t {
 }
 export interface valCorr_t{
     units: number;
-    slope: number;
+    //slope: number;
     offset: number;
 }
 

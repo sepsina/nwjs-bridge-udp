@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, AfterViewInit, NgZone, OnDestroy, ApplicationRef } from '@angular/core';
+import {Component, Inject, OnInit, AfterViewInit, NgZone, OnDestroy, ApplicationRef, HostListener } from '@angular/core';
 import { EventsService } from '../services/events.service';
 import { Validators, FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -13,6 +13,16 @@ import { debounceTime } from "rxjs/operators";
     styleUrls: ['./edit-scrolls.css']
 })
 export class EditScrolls implements OnInit, AfterViewInit, OnDestroy {
+
+    @HostListener('document:keyup', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        switch(event.key){
+            case 'Escape': {
+                this.close();
+                break;
+            }
+        }
+    }
 
     minPos = 0;
     maxPos = 100;
