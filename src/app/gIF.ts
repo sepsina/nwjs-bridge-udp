@@ -122,6 +122,11 @@ export interface hostedAttr_t {
     attrVals: number[];
 }
 
+export interface keyVal_t {
+    key: string;
+    value: hostedAttr_t;
+}
+
 export interface attrKey_t {
     shortAddr: number;
     endPoint: number;
@@ -130,7 +135,7 @@ export interface attrKey_t {
     attrID: number;
 }
 
-export interface storedAttr_t {
+export interface nvAttr_t {
     attrName: string;
     pos: nsPos_t;
     style: ngStyle_t;
@@ -179,7 +184,7 @@ export interface bind_t {
     endPoint: number;
 }
 
-export interface storedBind_t {
+export interface nvBind_t {
     bindName: string;
 }
 

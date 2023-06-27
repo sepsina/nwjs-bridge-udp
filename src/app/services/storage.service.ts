@@ -4,6 +4,10 @@ import { Injectable } from '@angular/core';
 import * as gIF from '../gIF';
 import * as gConst from '../gConst';
 
+const ATTR = 'attr';
+const BIND = 'bind';
+const THERMOSTAT = 'thermostat';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -24,7 +28,7 @@ export class StorageService {
     }
 
     async init() {
-        localStorage.clear();
+        //localStorage.clear();
     }
 
     /***********************************************************************************************
@@ -38,13 +42,13 @@ export class StorageService {
         for(let i = 0; i < localStorage.length; i++) {
             let key = localStorage.key(i);
             const val = JSON.parse(localStorage.getItem(key));
-            if(key.slice(0, 4) == 'attr') {
+            if(key.slice(0, ATTR.length) == ATTR) {
                 this.nvAttrMap.set(key, val);
             }
-            if(key.slice(0, 4) == 'bind') {
+            if(key.slice(0, BIND.length) == BIND) {
                 this.nvBindsMap.set(key, val);
             }
-            if(key.slice(0, 10) == 'thermostat') {
+            if(key.slice(0, THERMOSTAT.length) == THERMOSTAT) {
                 this.nvThermostatsMap.set(key, val);
             }
         }
@@ -56,24 +60,22 @@ export class StorageService {
      * brief
      *
      */
-    setAttrName(name: string,
-                keyVal: any): gIF.storedAttr_t {
-        let key: string = keyVal.key;
-        let selAttr: gIF.hostedAttr_t = keyVal.value;
-        let storedAttr = {} as gIF.storedAttr_t;
+    setAttrName(name: string, keyVal: gIF.keyVal_t): gIF.nvAttr_t {
 
-        storedAttr.attrName = name;
-        storedAttr.pos = selAttr.pos;
-        storedAttr.style = selAttr.style;
-        storedAttr.valCorr = selAttr.valCorr;
+        const key = keyVal.key;
+        const attr = keyVal.value;
+        let nvAttr = {} as gIF.nvAttr_t;
 
-        localStorage.setItem(key, JSON.stringify(storedAttr));
+        nvAttr.attrName = name;
+        nvAttr.pos = attr.pos;
+        nvAttr.style = attr.style;
+        nvAttr.valCorr = attr.valCorr;
 
-        selAttr.name = name;
+        localStorage.setItem(key, JSON.stringify(nvAttr));
+        attr.name = name;
+        this.nvAttrMap.set(key, nvAttr);
 
-        this.nvAttrMap.set(key, storedAttr);
-
-        return storedAttr;
+        return nvAttr;
     }
 
     /***********************************************************************************************
@@ -82,24 +84,22 @@ export class StorageService {
      * brief
      *
      */
-    setAttrStyle(style: gIF.ngStyle_t,
-                 keyVal: any): gIF.storedAttr_t {
-        let key: string = keyVal.key;
-        let selAttr: gIF.hostedAttr_t = keyVal.value;
-        let storedAttr = {} as gIF.storedAttr_t;
+    setAttrStyle(style: gIF.ngStyle_t, keyVal: gIF.keyVal_t): gIF.nvAttr_t {
 
-        storedAttr.attrName = selAttr.name;
-        storedAttr.pos = selAttr.pos;
-        storedAttr.style = style;
-        storedAttr.valCorr = selAttr.valCorr;
+        const key = keyVal.key;
+        const attr = keyVal.value;
+        let nvAttr = {} as gIF.nvAttr_t;
 
-        localStorage.setItem(key, JSON.stringify(storedAttr));
+        nvAttr.attrName = attr.name;
+        nvAttr.pos = attr.pos;
+        nvAttr.style = style;
+        nvAttr.valCorr = attr.valCorr;
 
-        selAttr.style = style;
+        localStorage.setItem(key, JSON.stringify(nvAttr));
+        attr.style = style;
+        this.nvAttrMap.set(key, nvAttr);
 
-        this.nvAttrMap.set(key, storedAttr);
-
-        return storedAttr;
+        return nvAttr;
     }
 
     /***********************************************************************************************
@@ -108,54 +108,22 @@ export class StorageService {
      * brief
      *
      */
-    setAttrCorr(valCorr: gIF.valCorr_t,
-                keyVal: any): gIF.storedAttr_t {
-        let key: string = keyVal.key;
-        let selAttr: gIF.hostedAttr_t = keyVal.value;
-        let storedAttr = {} as gIF.storedAttr_t;
+    setAttrCorr(valCorr: gIF.valCorr_t, keyVal: gIF.keyVal_t): gIF.nvAttr_t {
 
-        storedAttr.attrName = selAttr.name;
-        storedAttr.pos = selAttr.pos;
-        storedAttr.style = selAttr.style;
-        storedAttr.valCorr = valCorr;
+        const key = keyVal.key;
+        const attr: gIF.hostedAttr_t = keyVal.value;
+        let nvAttr = {} as gIF.nvAttr_t;
 
-        localStorage.setItem(key, JSON.stringify(storedAttr));
+        nvAttr.attrName = attr.name;
+        nvAttr.pos = attr.pos;
+        nvAttr.style = attr.style;
+        nvAttr.valCorr = valCorr;
 
-        selAttr.valCorr = valCorr;
+        localStorage.setItem(key, JSON.stringify(nvAttr));
+        attr.valCorr = valCorr;
+        this.nvAttrMap.set(key, nvAttr);
 
-        this.nvAttrMap.set(key, storedAttr);
-
-        return storedAttr;
-    }
-
-    /***********************************************************************************************
-     * fn          setAttrNameAndStyle
-     *
-     * brief
-     *
-     */
-    setAttrNameAndStyle(name: string,
-                        style: gIF.ngStyle_t,
-                        valCorr: gIF.valCorr_t,
-                        keyVal: any): gIF.storedAttr_t {
-        let key: string = keyVal.key;
-        let selAttr: gIF.hostedAttr_t = keyVal.value;
-        let storedAttr = {} as gIF.storedAttr_t;
-
-        storedAttr.attrName = name;
-        storedAttr.pos = selAttr.pos;
-        storedAttr.style = style;
-        storedAttr.valCorr = valCorr;
-
-        localStorage.setItem(key, JSON.stringify(storedAttr));
-
-        selAttr.name = name;
-        selAttr.style = style;
-        selAttr.valCorr = valCorr;
-
-        this.nvAttrMap.set(key, storedAttr);
-
-        return storedAttr;
+        return nvAttr;
     }
 
     /***********************************************************************************************
@@ -164,20 +132,20 @@ export class StorageService {
      * brief
      *
      */
-    setAttrPos(pos: gIF.nsPos_t, keyVal: any) {
+    setAttrPos(pos: gIF.nsPos_t, keyVal: gIF.keyVal_t) {
 
-        let key: string = keyVal.key;
-        let selAttr: gIF.hostedAttr_t = keyVal.value;
-        let storedAttr = {} as gIF.storedAttr_t;
+        const key = keyVal.key;
+        const attr = keyVal.value;
+        let nvAttr = {} as gIF.nvAttr_t;
 
-        storedAttr.attrName = selAttr.name;
-        storedAttr.pos = pos;
-        storedAttr.style = selAttr.style;
-        storedAttr.valCorr = selAttr.valCorr;
+        nvAttr.attrName = attr.name;
+        nvAttr.pos = pos;
+        nvAttr.style = attr.style;
+        nvAttr.valCorr = attr.valCorr;
 
-        localStorage.setItem(key, JSON.stringify(storedAttr));
+        localStorage.setItem(key, JSON.stringify(nvAttr));
 
-        selAttr.pos = pos;
+        attr.pos = pos;
     }
 
     /***********************************************************************************************
@@ -223,16 +191,7 @@ export class StorageService {
         for (let i = 0; i < len; i++) {
             key[i] = dv.getUint8(i).toString(16);
         }
-        return `attr-${key.join('')}`;
-        /*
-        let key = `attr-${params.shortAddr.toString(16).padStart(4, '0').toUpperCase()}`;
-        key += `:${params.endPoint.toString(16).padStart(2, '0').toUpperCase()}`;
-        key += `:${params.clusterID.toString(16).padStart(4, '0').toUpperCase()}`;
-        key += `:${params.attrSetID.toString(16).padStart(4, '0').toUpperCase()}`;
-        key += `:${params.attrID.toString(16).padStart(4, '0').toUpperCase()}`;
-
-        return key;
-        */
+        return `${ATTR}-${key.join('')}`;
     }
 
     /***********************************************************************************************
@@ -246,11 +205,11 @@ export class StorageService {
         const key = this.bindKey(bind);
         const val: gIF.hostedBind_t = this.bindsMap.get(key);
         if(val) {
-            let storedBind = {} as gIF.storedBind_t;
-            storedBind.bindName = bind.name;
-            localStorage.setItem(key, JSON.stringify(storedBind));
+            let nvBind = {} as gIF.nvBind_t;
+            nvBind.bindName = bind.name;
+            localStorage.setItem(key, JSON.stringify(nvBind));
             val.name = bind.name;
-            this.nvBindsMap.set(key, storedBind);
+            this.nvBindsMap.set(key, nvBind);
         }
     }
 
@@ -293,14 +252,7 @@ export class StorageService {
         for (let i = 0; i < len; i++) {
             key[i] = dv.getUint8(i).toString(16);
         }
-        return `bind-${key.join('')}`;
-        /*
-        let key = `bind-${bind.srcShortAddr.toString(16).padStart(4, '0').toUpperCase()}`;
-        key += `:${bind.srcEP.toString(16).padStart(2, '0').toUpperCase()}`;
-        key += `:${bind.clusterID.toString(16).padStart(4, '0').toUpperCase()}`;
-
-        return key;
-        */
+        return `${BIND}-${key.join('')}`;
     }
 
     /***********************************************************************************************
@@ -386,7 +338,7 @@ export class StorageService {
         for (let i = 0; i < len; i++) {
             key[i] = dv.getUint8(i).toString(16);
         }
-        return `thermostat-${key.join('')}`;
+        return `${THERMOSTAT}-${key.join('')}`;
 
     }
 

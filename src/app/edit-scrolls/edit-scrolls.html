@@ -14,10 +14,13 @@
     <mat-form-field id="scroll-sel">
         <mat-label>scroll</mat-label>
         <mat-select [formControl]="scrollFormCtrl">
-            <mat-option *ngFor="let scroll of scrolls"
-                        [value]="scroll">
-                {{scroll.name}}
-            </mat-option>
+            <div cdkDropList (cdkDropListDropped)="listDrop($event)">
+                <span *ngFor="let scroll of scrolls" cdkDrag>
+                    <mat-option [value]="scroll">
+                        {{scroll.name}}
+                    </mat-option>
+                </span>
+            </div>
         </mat-select>
         <mat-error *ngIf="scrollFormCtrl.hasError('required')">choose scroll</mat-error>
     </mat-form-field>

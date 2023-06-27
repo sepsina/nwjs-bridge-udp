@@ -2,6 +2,7 @@ import {Component, Inject, OnInit, AfterViewInit, NgZone, OnDestroy, Application
 import { EventsService } from '../services/events.service';
 import { Validators, FormControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import * as gIF from '../gIF'
 
 import { Subscription } from 'rxjs';
@@ -216,8 +217,6 @@ export class EditScrolls implements OnInit, AfterViewInit, OnDestroy {
      *
      */
     yPosChange(event) {
-        console.log(event.target.value);
-        //let pos = event.target.value;
         this.yPosSet(event.target.value);
     }
 
@@ -229,7 +228,7 @@ export class EditScrolls implements OnInit, AfterViewInit, OnDestroy {
      */
     yPosSet(pos: number) {
 
-        console.log(`yPos: ${pos}`);
+        //console.log(`yPos: ${pos}`);
 
         if(pos < 0){
             pos = 0;
@@ -304,4 +303,18 @@ export class EditScrolls implements OnInit, AfterViewInit, OnDestroy {
         this.yPosSet(event.value.yPos);
     }
     */
+
+    /***********************************************************************************************
+     * @fn          listDrop
+     *
+     * @brief
+     *
+     */
+    listDrop(event: CdkDragDrop<string[]>) {
+
+        moveItemInArray(this.scrolls,
+                        event.previousIndex,
+                        event.currentIndex);
+    }
+
 }

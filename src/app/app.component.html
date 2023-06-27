@@ -37,19 +37,20 @@
         </div>
         <div id="plan-container" #containerRef>
             <div id="floor-plan" #floorPlanRef resizeObserver (resize)="onResize($event)">
-                <div *ngFor="let attr of storage.attrMap | keyvalue;"
+                <div *ngFor="let keyVal of storage.attrMap | keyvalue;"
                      class="attr"
+                     [ngStyle]="getAttrStyle(keyVal)"
                      cdkDrag
                      [cdkDragBoundary]="floorPlanRef"
-                     (cdkDragEnded)="attr.value.drag=false; onDragEnded($event, attr)"
-                     (cdkDragStarted)="attr.value.drag=true; onDragStarted($event)"
-                     [cdkDragFreeDragPosition]="getAttrPosition(attr)"
-                     (mouseenter)="setSelAttr(attr)"
-                     (mouseleave)="mouseLeaveAttr(attr)"
-                     highlightSel
-                     [ngStyle]="getAttrStyle(attr)"
-                     [cdkContextMenuTriggerFor]="ctx_menu">
-                        {{attr.value.formatedVal}}
+                     (cdkDragEnded)="onDragEnded($event, keyVal)"
+                     (cdkDragStarted)="onDragStarted($event, keyVal)"
+                     [cdkDragFreeDragPosition]="getAttrPosition(keyVal)"
+                     (mouseenter)="mouseEnterAttr(keyVal)"
+                     (mouseleave)="mouseLeaveAttr()"
+                     #dragRef=cdkDrag
+                     [cdkContextMenuTriggerFor]="ctx_menu"
+                     (cdkContextMenuOpened)="ctxMenuOpened(keyVal, dragRef)">
+                        {{keyVal.value.formatedVal}}
                 </div>
             </div>
         </div>
@@ -93,6 +94,12 @@
                 class="ctx-menu-item"
                 (cdkMenuItemTriggered)="graph(selAttr)">
             Graph
+        </button>
+        <button *ngIf="moveFlag"
+                cdkMenuItem
+                class="ctx-menu-item"
+                (cdkMenuItemTriggered)="moveElement()">
+            Move
         </button>
         <button cdkMenuItem
                 class="ctx-menu-item"

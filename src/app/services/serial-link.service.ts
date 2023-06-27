@@ -355,7 +355,7 @@ export class SerialLinkService implements OnDestroy {
         let now = Math.round(Date.now() / 1000);
         let setVals = {} as any;
         let key: string;
-        let nvAttr: gIF.storedAttr_t;
+        let nvAttr: gIF.nvAttr_t;
         let spec: gIF.attrSpec_t;
         let formatedVal = '';
         let attrID: number;

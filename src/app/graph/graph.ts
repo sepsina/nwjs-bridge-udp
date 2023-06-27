@@ -82,6 +82,7 @@ export class Graph implements OnInit, OnDestroy {
                 }
             },
             y: {
+                position: 'right',
                 min: 0,
                 max: 1,
                 border: {
@@ -134,7 +135,8 @@ export class Graph implements OnInit, OnDestroy {
         this.lineChartData.datasets[0].data = [];
 
         const len = this.selAttr.timestamps.length;
-        const start = this.selAttr.timestamps[0];
+        //const start = this.selAttr.timestamps[0];
+        const end = this.selAttr.timestamps[len-1];
         let minVal = 1e6;
         let maxVal = -1e6;
         let corrVal = 0;
@@ -147,7 +149,8 @@ export class Graph implements OnInit, OnDestroy {
                 }
             }
             this.lineChartData.datasets[0].data[i] = corrVal;
-            this.lineChartData.labels[i] = this.utils.secToTime(this.selAttr.timestamps[i] - start);
+            //this.lineChartData.labels[i] = this.utils.secToTime(this.selAttr.timestamps[i] - start);
+            this.lineChartData.labels[i] = this.utils.secToTime(end - this.selAttr.timestamps[i]);
             if(corrVal > maxVal){
                 maxVal = corrVal;
             }

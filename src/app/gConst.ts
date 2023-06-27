@@ -5,6 +5,8 @@ export const HEAD_LEN = 5;
 export const LEN_IDX = 2;
 export const CRC_IDX = 4;
 
+export const DUMMY_SCROLL = '- scroll -';
+
 export const DFLT_IMG_DIR = 'files';
 export const DFLT_BKG_IMG = '../../assets/floor_plan.jpg';
 export const DFLT_IMG_NAME = 'floor_plan';

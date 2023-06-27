@@ -1,4 +1,4 @@
-import { Component, Inject, NgZone, AfterViewInit, ElementRef, ViewChild, HostListener } from '@angular/core';
+import { Component, Inject, NgZone, AfterViewInit, HostListener } from '@angular/core';
 import { SerialLinkService } from '../services/serial-link.service';
 import { StorageService } from '../services/storage.service';
 import { UtilsService } from '../services/utils.service';
@@ -9,11 +9,6 @@ import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 
 import * as gConst from '../gConst';
 import * as gIF from '../gIF'
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-
-const EMPTY_NAME = '--- empty ---';
-const UNKNOWN_NAME = 'unknown';
-const USED_NAME = '--- used ---';
 
 @Component({
     selector: 'app-binds',
@@ -21,9 +16,6 @@ const USED_NAME = '--- used ---';
     styleUrls: ['./binds.page.scss'],
 })
 export class EditBinds implements AfterViewInit {
-
-    @ViewChild('bindBoxRef', {read: ElementRef, static:false}) bindBoxRef: ElementRef;
-    @ViewChild('usedWrapRef', {read: ElementRef, static:false}) wrapRef: ElementRef;
 
     @HostListener('document:keyup', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
@@ -34,16 +26,13 @@ export class EditBinds implements AfterViewInit {
             }
         }
     }
-
     allBindSrc: gIF.hostedBind_t[] = [];
     bindSrc = {} as gIF.hostedBind_t;
-    //usedBindDst: gIF.bind_t[] = [];
+
     freeBindDst: gIF.bind_t[] = [];
     allBindDst: gIF.bind_t[] = [];
 
     srcValid = false;
-    //selUsedBindDst: gIF.bind_t = null;
-    //selFreeBindDst: gIF.bind_t = null;
 
     selBindDst: gIF.bind_t;
 

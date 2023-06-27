@@ -17,6 +17,7 @@ import { HighlightSel } from "./directives/highlight-sel.directive";
 import { ResizeObserverDirective } from './directives/resize-observer.directive';
 import { SSR } from './ssr/ssr';
 import { Graph } from './graph/graph';
+import { MoveElement } from './move-element/move-element';
 
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -47,7 +48,8 @@ const matFormFieldDefaultOptions: MatFormFieldDefaultOptions = {
         HighlightSel,
         ResizeObserverDirective,
         SSR,
-        Graph
+        Graph,
+        MoveElement
     ],
     imports: [
         CommonModule,

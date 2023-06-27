@@ -1,0 +1,27 @@
+<div id="dlg-head"
+     cdkDrag
+     cdkDragRootElement=".cdk-overlay-pane"
+     cdkDragBoundary=".cdk-overlay-container">
+    <div id="edit-title" cdkDragHandle>
+        {{name}}
+    </div>
+    <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<mat-form-field class="form-field">
+    <mat-select (selectionChange)="scrollSelChange($event)"
+                [(value)]="selScroll">
+        <mat-option *ngFor="let scroll of scrolls" [value]="scroll">
+            {{scroll.name}}
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+
+<div class="set-actions">
+    <div>
+        <button mat-stroked-button (click)="save()">Save</button>
+    </div>
+</div>
+

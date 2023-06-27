@@ -5,33 +5,30 @@ import { UdpService } from './services/udp.service';
 import { StorageService } from './services/storage.service';
 import { UtilsService } from './services/utils.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { MatTooltip } from '@angular/material/tooltip';
 
 import { SetStyles } from './set-styles/set-styles.page';
 import { EditScrolls } from './edit-scrolls/edit-scrolls';
-import { EditFreeDNS } from './edit-freeDNS/edit-freeDNS';
 import { EditBinds } from './binds/binds.page';
 import { EditStats } from './x-stat/x_stat.page';
 
 import * as gConst from './gConst';
 import * as gIF from './gIF';
 
-import { CdkDragEnd, CdkDragStart } from '@angular/cdk/drag-drop';
-import { DialogConfig } from '@angular/cdk/dialog';
-import { environment } from 'src/environments/environment';
-
+import { CdkDrag, CdkDragEnd, CdkDragStart } from '@angular/cdk/drag-drop';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, of, throwError } from 'rxjs';
+
 import { ShowLogs } from './logs/show-logs';
 import { About } from './about/about';
 import { SSR } from './ssr/ssr';
 import { SetName } from './set-name/set-name';
 import { Graph } from './graph/graph';
+import { MoveElement } from './move-element/move-element';
 import { SetCorr } from './set-corr/set-corr';
+import { CdkContextMenuTrigger } from '@angular/cdk/menu';
 
-const DUMMY_SCROLL = '- scroll -';
+
 const dumyScroll: gIF.scroll_t = {
-    name: DUMMY_SCROLL,
+    name: gConst.DUMMY_SCROLL,
     yPos: 0
 }
 
@@ -48,6 +45,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('containerRef') containerRef: ElementRef;
     @ViewChild('floorPlanRef') floorPlanRef: ElementRef;
 
+    @ViewChild(CdkContextMenuTrigger) ctxMenu: CdkContextMenuTrigger;
+
     bkgImgWidth: number;
     bkgImgHeight: number;
     imgUrl: string;
@@ -55,36 +54,27 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     planPath = '';
 
     scrolls: gIF.scroll_t[] = [
-        dumyScroll,
-        {
-            name: 'floor-1',
-            yPos: 10
-        },
-        {
-            name: 'floor-2',
-            yPos: 50
-        },
+        dumyScroll
     ];
-
     selScroll = this.scrolls[0];
 
     partDesc: gIF.partDesc_t[] = [];
     partMap = new Map();
 
-    dragFlag = false;
-
     progressFlag = false;
     waitMsg = 'wait';
     msgIdx = 0;
 
-    selAttr = {} as any;
+    selAttr = {} as gIF.keyVal_t;
     ctrlFlag = false;
     graphFlag = false;
     corrFlag = false;
+    moveFlag = false;
 
     footerTmo: any;
     footerStatus = '';
 
+    dragRef: CdkDrag;
 
     constructor(private events: EventsService,
                 private serialLink: SerialLinkService,
@@ -105,7 +95,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      *
      */
     ngAfterViewInit() {
-        this.init();
+        setTimeout(() => {
+            this.init();
+        }, 10);
     }
 
     /***********************************************************************************************
@@ -144,31 +136,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     init() {
 
         const partsURL = '/assets/parts.json';
-        /*
-        fetch(partsURL).then(
-            (rsp)=>{
-                rsp.json().then(
-                    (parts)=>{
-                        this.partDesc = parts;
-                        for(let desc of this.partDesc) {
-                            let part = {} as gIF.part_t;
-                            part.devName = desc.devName;
-                            part.part = desc.part;
-                            part.url = desc.url;
-                            this.partMap.set(desc.partNum, part);
-                        }
-                        console.log(JSON.stringify(this.partDesc));
-                    },
-                    (err)=>{
-                        console.log('[ err ] failed to fetch parts');
-                    }
-                );
-            },
-            (err)=>{
-                console.log(err);
-            }
-        );
-        */
+
         this.httpClient.get(partsURL).subscribe({
             next: (parts: gIF.partDesc_t[])=>{
                 this.partDesc = [];
@@ -181,7 +149,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                     part.url = desc.url;
                     this.partMap.set(desc.partNum, part);
                 }
-                console.log(JSON.stringify(this.partDesc));
+                //console.log(JSON.stringify(this.partDesc));
             },
             error: (err: HttpErrorResponse)=>{
                 console.log(err.message);
@@ -193,7 +161,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         bkgImg.onload = ()=>{
             this.bkgImgWidth = bkgImg.width;
             this.bkgImgHeight = bkgImg.height;
-            //const el = this.containerRef.nativeElement;
             const el = this.floorPlanRef.nativeElement;
             let divDim = el.getBoundingClientRect();
             this.imgDim.width = divDim.width;
@@ -205,31 +172,15 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             this.renderer.setStyle(el, 'backgroundSize', 'contain');
         };
         bkgImg.src = bkgImgPath;
-        /*
-        try {
-            let partsPath = './src/assets/parts.json';
-            if(environment.production) {
-                partsPath = './assets/parts.json'
+
+        const nvScrolls = JSON.parse(this.storage.getScrolls());
+        if(nvScrolls){
+            this.scrolls = [];
+            for(let i = 0; i < nvScrolls.length; i++){
+                this.scrolls.push(nvScrolls[i]);
             }
-            const fs = window.nw.require('fs');
-            let parts = fs.readFileSync(partsPath, 'utf8');
-            this.partDesc = JSON.parse(parts);
-            for(let desc of this.partDesc) {
-                let part = {} as gIF.part_t;
-                part.devName = desc.devName;
-                part.part = desc.part;
-                part.url = desc.url;
-                this.partMap.set(desc.partNum, part);
-            }
-            console.log(JSON.stringify(this.partDesc));
+            this.selScroll = this.scrolls[0];
         }
-        catch (err) {
-            console.log('read parts err: ' + JSON.stringify(err));
-        }
-        */
-        //this.scrolls = [];
-        //const scrolls = await this.ns.getScrolls();
-        //this.scrolls = JSON.parse(this.storage.getScrolls());
     }
 
     /***********************************************************************************************
@@ -238,23 +189,24 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      * brief
      *
      */
-    getAttrStyle(attr: any) {
+    getAttrStyle(keyVal: gIF.keyVal_t) {
 
-        let attrStyle = attr.value.style;
+        const attr = keyVal.value;
+
         let retStyle = {
-            color: attrStyle.color,
-            'background-color': attrStyle.bgColor,
-            'font-size.px': attrStyle.fontSize,
-            'border-color': attrStyle.borderColor,
-            'border-width.px': attrStyle.borderWidth,
-            'border-style': attrStyle.borderStyle,
-            'border-radius.px': attrStyle.borderRadius,
-            'padding-top.px': attrStyle.paddingTop,
-            'padding-right.px': attrStyle.paddingRight,
-            'padding-bottom.px': attrStyle.paddingBottom,
-            'padding-left.px': attrStyle.paddingLeft,
+            color: attr.style.color,
+            'background-color': attr.style.bgColor,
+            'font-size.px': attr.style.fontSize,
+            'border-color': attr.style.borderColor,
+            'border-width.px': attr.style.borderWidth,
+            'border-style': attr.style.borderStyle,
+            'border-radius.px': attr.style.borderRadius,
+            'padding-top.px': attr.style.paddingTop,
+            'padding-right.px': attr.style.paddingRight,
+            'padding-bottom.px': attr.style.paddingBottom,
+            'padding-left.px': attr.style.paddingLeft,
         };
-        if(attr.value.isValid == false) {
+        if(attr.isValid == false) {
             retStyle.color = 'gray';
             retStyle['background-color'] = 'transparent';
             retStyle['border-color'] = 'gray';
@@ -270,74 +222,54 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      * brief
      *
      */
-    getAttrPosition(attr: any) {
+    getAttrPosition(keyVal: gIF.keyVal_t) {
 
-        if(attr.value.drag){
+        const attr = keyVal.value;
+
+        if(attr.drag){
             return undefined;
         }
-        let attrPos = attr.value.pos;
 
         return {
-            x: attrPos.x * this.imgDim.width,
-            y: attrPos.y * this.imgDim.height,
+            x: attr.pos.x * this.imgDim.width,
+            y: attr.pos.y * this.imgDim.height,
         };
     }
 
-    /***********************************************************************************************
-     * fn          setBkgImg
-     *
-     * brief
-     *
-     *
-    setBkgImg() {
-
-        let bkgImg = new Image();
-        bkgImg.onload = ()=>{
-            this.bkgImgWidth = bkgImg.width;
-            this.bkgImgHeight = bkgImg.height;
-            const el = this.containerRef.nativeElement;
-            let divDim = el.getBoundingClientRect();
-            this.imgDim.width = divDim.width;
-            this.imgDim.height = Math.round((divDim.width / bkgImg.width) * bkgImg.height);
-            this.renderer.setStyle(el, 'height', `${this.imgDim.height}px`);
-            this.renderer.setStyle(el, 'backgroundImage', `url(${bkgImgPath})`);
-            this.renderer.setStyle(el, 'backgroundAttachment', 'scroll');
-            this.renderer.setStyle(el, 'backgroundRepeat', 'no-repeat');
-            this.renderer.setStyle(el, 'backgroundSize', 'contain');
-        };
-        bkgImg.src = bkgImgPath;
-    }
-    */
     /***********************************************************************************************
      * @fn          onDragEnded
      *
      * @brief
      *
      */
-    onDragEnded(event: CdkDragEnd, keyVal: any) {
+    onDragEnded(event: CdkDragEnd, keyVal: gIF.keyVal_t) {
 
-        this.dragFlag = false;
+        const attr = keyVal.value;
+
+        attr.drag = false;
         event.source.element.nativeElement.style.zIndex = '1';
 
         const evtPos = event.source.getFreeDragPosition();
-
         let pos: gIF.nsPos_t = {
             x: evtPos.x / this.imgDim.width,
             y: evtPos.y / this.imgDim.height,
         };
-        keyVal.value.pos = pos;
+        attr.pos = pos;
 
         this.storage.setAttrPos(pos, keyVal);
     }
 
     /***********************************************************************************************
-     * @fn          onDragEnded
+     * @fn          onDragStarted
      *
      * @brief
      *
      */
-    onDragStarted(event: CdkDragStart) {
-        this.dragFlag = true;
+    onDragStarted(event: CdkDragStart, keyVal: gIF.keyVal_t) {
+
+        const attr = keyVal.value;
+
+        attr.drag = true;
         event.source.element.nativeElement.style.zIndex = '10000';
     }
 
@@ -347,7 +279,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      * @brief
      *
      */
-    setStyles(keyVal: any) {
+    setStyles(keyVal: gIF.keyVal_t) {
 
         this.startWait();
         setTimeout(()=>{
@@ -358,8 +290,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'set-styles-container';
             dialogConfig.restoreFocus = false;
-            //dialogConfig.enterAnimationDuration = '0ms';
-            //dialogConfig.exitAnimationDuration = '0ms'
 
             const dlgRef = this.matDialog.open(SetStyles, dialogConfig);
             dlgRef.afterOpened().subscribe(()=>{
@@ -374,7 +304,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      * @brief
      *
      */
-    setName(keyVal: any) {
+    setName(keyVal: gIF.keyVal_t) {
 
         this.startWait();
         setTimeout(()=>{
@@ -385,8 +315,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'set-name-container';
             dialogConfig.restoreFocus = false;
-            //dialogConfig.enterAnimationDuration = '0ms';
-            //dialogConfig.exitAnimationDuration = '0ms'
 
             const dlgRef = this.matDialog.open(SetName, dialogConfig);
             dlgRef.afterOpened().subscribe(()=>{
@@ -401,19 +329,17 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      * @brief
      *
      */
-    setCorr(keyVal: any) {
+    setCorr(keyVal: gIF.keyVal_t) {
 
         this.startWait();
         setTimeout(()=>{
             const dialogConfig = new MatDialogConfig();
             dialogConfig.data = keyVal;
-            dialogConfig.width = '200px';
+            dialogConfig.width = '250px';
             dialogConfig.autoFocus = false;
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'set-corr-container';
             dialogConfig.restoreFocus = false;
-            //dialogConfig.enterAnimationDuration = '0ms';
-            //dialogConfig.exitAnimationDuration = '0ms'
 
             const dlgRef = this.matDialog.open(SetCorr, dialogConfig);
             dlgRef.afterOpened().subscribe(()=>{
@@ -428,7 +354,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      * @brief
      *
      */
-    graph(keyVal: any) {
+    graph(keyVal: gIF.keyVal_t) {
 
         this.startWait();
         setTimeout(()=>{
@@ -439,8 +365,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'graph-container';
             dialogConfig.restoreFocus = false;
-            //dialogConfig.enterAnimationDuration = '0ms';
-            //dialogConfig.exitAnimationDuration = '0ms'
 
             const dlgRef = this.matDialog.open(Graph, dialogConfig);
             dlgRef.afterOpened().subscribe(()=>{
@@ -478,39 +402,54 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.progressFlag = false;
             });
             dlgRef.afterClosed().subscribe((data: gIF.scroll_t[]) => {
-                if (data) {
+                if(data){
                     this.scrolls = data;
                     this.scrolls.unshift(dumyScroll);
-                    this.storage.setScrolls(data);
+                    this.storage.setScrolls(this.scrolls);
+                    this.selScroll = this.scrolls[0];
                 }
             });
         }, 10);
     }
 
     /***********************************************************************************************
-     * @fn          setDNS
+     * @fn          onEditScrollsClick
      *
      * @brief
      *
      */
-    setDNS() {
+    moveElement() {
 
         this.startWait();
         setTimeout(()=>{
+            const dlgData = {
+                scrolls: JSON.stringify(this.scrolls),
+                containerRef: this.containerRef.nativeElement,
+                imgDim: this.imgDim,
+                selAttr: this.selAttr,
+                dragRef: this.dragRef
+            };
             const dialogConfig = new MatDialogConfig();
-            dialogConfig.data = '';
-            dialogConfig.width = '350px';
+            dialogConfig.data = dlgData;
+            dialogConfig.width = '300px';
             dialogConfig.autoFocus = false;
             dialogConfig.disableClose = true;
-            dialogConfig.panelClass = 'set-dns-container';
+            dialogConfig.panelClass = 'move-element-container';
             dialogConfig.restoreFocus = false;
 
-            const dlgRef = this.matDialog.open(EditFreeDNS, dialogConfig);
+            const dlgRef = this.matDialog.open(MoveElement, dialogConfig);
+
             dlgRef.afterOpened().subscribe(()=>{
                 this.progressFlag = false;
             });
+            dlgRef.afterClosed().subscribe((data: gIF.scroll_t[]) => {
+                if(data){
+                    // ---
+                }
+            });
         }, 10);
     }
+
     /***********************************************************************************************
      * @fn          editBinds
      *
@@ -526,7 +465,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             };
             const dialogConfig = new MatDialogConfig();
             dialogConfig.data = dlgData;
-            //dialogConfig.minWidth = '300px';
             dialogConfig.autoFocus = false;
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'edit-binds-container';
@@ -555,7 +493,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             };
             const dialogConfig = new MatDialogConfig();
             dialogConfig.data = dlgData;
-            //dialogConfig.minWidth = '300px';
             dialogConfig.autoFocus = false;
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'edit-thermostats-container';
@@ -641,7 +578,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             };
             const dialogConfig = new MatDialogConfig();
             dialogConfig.data = dlgData;
-            dialogConfig.width = '40%';
+            dialogConfig.width = '350px';
             dialogConfig.autoFocus = false;
             dialogConfig.disableClose = true;
             dialogConfig.panelClass = 'show-ssr-container';
@@ -655,39 +592,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     /***********************************************************************************************
-     * fn          showTooltip
-     *
-     * brief
-     *
-     */
-    showTooltip(tt: MatTooltip, attr: gIF.hostedAttr_t) {
-
-        let ttMsg = '';
-        ttMsg += `attr-name: ${attr.name} \n`;
-        ttMsg += `S/N: ${this.utils.extToHex(attr.extAddr)} \n`;
-        let partDesc: gIF.part_t = this.partMap.get(attr.partNum);
-        if(partDesc) {
-            ttMsg += `node-name: ${partDesc.devName} \n`;
-            ttMsg += `part: ${partDesc.part} \n`;
-            ttMsg += `url: ${partDesc.url} \n`;
-        }
-        tt.message = ttMsg;
-        tt.showDelay = 500;
-        tt.tooltipClass = 'attr-tooltip';
-        tt.show();
-    }
-    /***********************************************************************************************
-     * fn          hideTooltip
-     *
-     * brief
-     *
-     *
-    hideTooltip(tt: MatTooltip){
-        tt.hide();
-    }
-    */
-
-    /***********************************************************************************************
      * fn          scrollSelChange
      *
      * brief
@@ -695,9 +599,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      */
     scrollSelChange(scroll){
 
-        console.log(scroll);
         if(scroll.value){
-            if(scroll.value.name !== DUMMY_SCROLL){
+            if(scroll.value.name !== gConst.DUMMY_SCROLL){
                 const x = 0;
                 const y = (scroll.value.yPos * this.imgDim.height) / 100;
 
@@ -796,6 +699,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      *
      */
     startWait(){
+
         this.progressFlag = true;
         this.waitMsg = 'wait...';
         /*
@@ -813,6 +717,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      *
      */
     incrWait(){
+
         if(this.progressFlag === true){
             let strArr = wait_msg.split('');
             strArr[this.msgIdx] = 'x';
@@ -828,18 +733,52 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     /***********************************************************************************************
-     * fn          setSelAttr
+     * fn          mouseEnterAttr
      *
      * brief
      *
      */
-    setSelAttr(keyVal: any){
+    mouseEnterAttr(keyVal: gIF.keyVal_t){
 
+        const attr = keyVal.value;
+        const partDesc: gIF.part_t = this.partMap.get(attr.partNum);
+
+        this.footerStatus  = `${attr.name}: `;
+        this.footerStatus += `${partDesc.part}`;
+        this.footerStatus += ` -> ${partDesc.devName}`;
+        this.footerStatus += ` @ ${this.utils.extToHex(attr.extAddr)}`;
+        clearTimeout(this.footerTmo);
+        this.footerTmo = setTimeout(()=>{
+            this.footerStatus = '';
+        }, 5000);
+
+    }
+
+    /***********************************************************************************************
+     * fn          mouseLeaveAttr
+     *
+     * brief
+     *
+     */
+    mouseLeaveAttr(){
+        this.footerStatus = '';
+    }
+
+    /***********************************************************************************************
+     * fn          ctxMenuOpened
+     *
+     * brief
+     *
+     */
+    ctxMenuOpened(keyVal: gIF.keyVal_t, dragRef: CdkDrag){
+
+        this.dragRef = dragRef;
         this.selAttr = keyVal;
-        const attrVal: gIF.hostedAttr_t = keyVal.value;
+        const attr = keyVal.value;
+
         this.ctrlFlag = false;
         this.corrFlag = false;
-        switch(attrVal.partNum){
+        switch(attr.partNum){
             case gConst.ACUATOR_010_ON_OFF:
             case gConst.SSR_009_RELAY: {
                 this.ctrlFlag = true;
@@ -852,28 +791,13 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         }
         this.graphFlag = false;
-        if(attrVal.attrVals.length > 1){
+        if(attr.attrVals.length > 1){
             this.graphFlag = true;
         }
-
-        let partDesc: gIF.part_t = this.partMap.get(attrVal.partNum);
-        this.footerStatus  = `${partDesc.part}`;
-        this.footerStatus += ` -> ${partDesc.devName}`;
-        this.footerStatus += ` @ ${this.utils.extToHex(attrVal.extAddr)}`;
-        clearTimeout(this.footerTmo);
-        this.footerTmo = setTimeout(()=>{
-            this.footerStatus = '';
-        }, 5000);
-    }
-
-    /***********************************************************************************************
-     * fn          mouseLeaveAttr
-     *
-     * brief
-     *
-     */
-    mouseLeaveAttr(keyVal: any){
-        this.footerStatus = '';
+        this.moveFlag = false;
+        if(this.scrolls.length > 2){
+            this.moveFlag = true;
+        }
     }
 
 }
