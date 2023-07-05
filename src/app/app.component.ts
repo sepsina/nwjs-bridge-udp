@@ -26,7 +26,6 @@ import { MoveElement } from './move-element/move-element';
 import { SetCorr } from './set-corr/set-corr';
 import { CdkContextMenuTrigger } from '@angular/cdk/menu';
 
-
 const dumyScroll: gIF.scroll_t = {
     name: gConst.DUMMY_SCROLL,
     yPos: 0
@@ -623,6 +622,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
      *
      */
     onResize(event) {
+
+        console.log(`with: ${window.innerWidth}`);
 
         const rect = event.contentRect;
         console.log(`w: ${rect.width}, h: ${rect.height}`);

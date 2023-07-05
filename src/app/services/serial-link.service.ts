@@ -11,7 +11,7 @@ import * as gIF from '../gIF';
 })
 export class SerialLinkService implements OnDestroy {
 
-    delTest: number;
+    //delTest: number;
 
     setMap = new Map();
 
