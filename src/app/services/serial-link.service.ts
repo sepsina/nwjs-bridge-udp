@@ -11,7 +11,7 @@ import * as gIF from '../gIF';
 })
 export class SerialLinkService implements OnDestroy {
 
-    //delTest: number;
+    delTest: number;
 
     setMap = new Map();
 
@@ -591,6 +591,34 @@ export class SerialLinkService implements OnDestroy {
                 break;
             }
             case gConst.DBL_SW_008_BAT: {
+                idx = 0;
+                let batVolt = valsView.getUint8(idx++);
+                batVolt /= 10.0;
+                attrID = 0;
+                key = this.getKey(attrSet, attrID);
+                nvAttr = this.storage.nvAttrMap.get(key);
+                attrName = '';
+                if(nvAttr) {
+                    attrName = nvAttr.attrName;
+                }
+                setVals = {
+                    name: attrName,
+                    bat_volt: batVolt,
+                };
+                spec = {
+                    attrID: attrID,
+                    isVisible: true,
+                    isSensor: false,
+                    hasHistory: false,
+                    formatedVal: `${batVolt.toFixed(1)} V`,
+                    units: gConst.VOLT_UNIT,
+                    timestamp: now,
+                    attrVal: batVolt,
+                };
+                attrSpecs.push(spec);
+                break;
+            }
+            case gConst.TGL_SW_011_BAT: {
                 idx = 0;
                 let batVolt = valsView.getUint8(idx++);
                 batVolt /= 10.0;

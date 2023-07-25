@@ -70,6 +70,10 @@ export const DBL_SW_008_PB_1 = 801;
 export const DBL_SW_008_PB_2 = 802;
 export const DBL_SW_008_BAT = 803;
 
+export const TGL_SW_011_BASE = 1100;
+export const TGL_SW_011_SW = 1101;
+export const TGL_SW_011_BAT = 1102;
+
 export const SSR_009_BASE = 900;
 export const SSR_009_RELAY = 901;
 

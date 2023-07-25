@@ -84,6 +84,24 @@
     "url": "www.serf.dbl_sw_008"
   },
   {
+    "partNum": 1100,
+    "devName": "TGL-SW-011",
+    "part": "base",
+    "url": "www.serf.tgl_sw_011"
+  },
+  {
+    "partNum": 1101,
+    "devName": "TGL-SW-011",
+    "part": "push button",
+    "url": "www.serf.tgl_sw_011"
+  },
+  {
+    "partNum": 1102,
+    "devName": "TGL-SW-011",
+    "part": "battery",
+    "url": "www.serf.tgl_sw_011"
+  },
+  {
     "partNum": 200,
     "devName": "DBL-RL-002",
     "part": "base",
