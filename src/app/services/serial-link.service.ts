@@ -320,15 +320,12 @@ export class SerialLinkService implements OnDestroy {
                         attr: gIF.hostedAttr_t) {
         let len = attr.timestamps.length;
         if(len > 0) {
-            const lastTime = attr.timestamps[len - 1];
-            if(timestamp - lastTime > 60) {
-                attr.timestamps.push(timestamp);
-                attr.attrVals.push(val);
-                len++;
-                if(len > 10) {
-                    attr.timestamps.shift();
-                    attr.attrVals.shift();
-                }
+            attr.timestamps.push(timestamp);
+            attr.attrVals.push(val);
+            len++;
+            if(len > gConst.HIST_LEN) {
+                attr.timestamps.shift();
+                attr.attrVals.shift();
             }
         }
         else {

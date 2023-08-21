@@ -7,6 +7,8 @@ export const CRC_IDX = 4;
 
 export const DUMMY_SCROLL = '- scroll -';
 
+export const HIST_LEN = 50;
+
 export const DFLT_IMG_DIR = 'files';
 export const DFLT_BKG_IMG = '../../assets/floor_plan.jpg';
 export const DFLT_IMG_NAME = 'floor_plan';
@@ -83,10 +85,10 @@ export const ACUATOR_010_ON_OFF = 1001;
 //export const MAX_DST_BINDS = 4;
 //export const MAX_SRC_BINDS = 14;
 
-export const ATTR_TTL = 600; // seconds
-export const ATTR_VALID_TTL = 120; // seconds
-export const BIND_TTL = 600; // seconds
-export const SET_TTL = 600; // seconds
+export const ATTR_TTL = 900; // seconds
+export const ATTR_VALID_TTL = 600; // seconds
+export const BIND_TTL = 900; // seconds
+export const SET_TTL = 900; // seconds
 
 export const BRIDGE_ID_REQ = 0x0001;
 export const BRIDGE_ID_RSP = 0x0002;
