@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, NgZone, OnDestroy, Renderer2 } from '@angular/core';
 import { EventsService } from './services/events.service';
 import { SerialLinkService } from './services/serial-link.service';
+import { PortService } from './services/port.service';
 import { UdpService } from './services/udp.service';
 import { StorageService } from './services/storage.service';
 import { UtilsService } from './services/utils.service';
@@ -77,6 +78,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
     constructor(private events: EventsService,
                 private serialLink: SerialLinkService,
+                private port: PortService,
                 private udp: UdpService,
                 public storage: StorageService,
                 private matDialog: MatDialog,
@@ -108,12 +110,16 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit() {
         window.onbeforeunload = async ()=>{
             this.udp.closeSocket();
-            this.serialLink.closeSocket();
+            this.port.closeSocket();
         };
 
         this.events.subscribe('temp_event', (event: gIF.tempEvent_t)=>{
             this.tempEvent(event);
         });
+
+        setTimeout(() => {
+            this.serialLink.initApp();
+        }, 100);
     }
 
     /***********************************************************************************************
@@ -412,7 +418,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     /***********************************************************************************************
-     * @fn          onEditScrollsClick
+     * @fn          moveElement
      *
      * @brief
      *
@@ -687,7 +693,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                     zclCmd.cmd[0] = 0x11; // cluster spec cmd, not manu spec, client to srv dir, disable dflt rsp
                     zclCmd.cmd[1] = 0x00; // seq num -> not used
                     zclCmd.cmd[2] = cmd;  // ON/OFF command
-                    this.serialLink.udpZclCmd(JSON.stringify(zclCmd));
+                    this.events.publish('zcl_cmd', zclCmd);
                 }
             }
         }

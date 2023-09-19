@@ -137,4 +137,7 @@ export const SL_CLOSE_CMD = 5;
 
 export const THERMOSTAT_HYSTERESIS = 0.5
 
+export const FREE_LIST_LEN = 12;
+export const USED_LIST_LEN = 6;
+
 

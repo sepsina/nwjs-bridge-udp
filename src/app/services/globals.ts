@@ -4,5 +4,10 @@ import { Injectable } from '@angular/core';
     providedIn: 'root'
 })
 export class Globals {
-    //partMap = new Map();
+
+    setMap = new Map();
+
+    constructor(){
+        // ---
+    };
 }

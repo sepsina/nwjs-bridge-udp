@@ -1,15 +1,11 @@
-///<reference types="chrome"/>
-import {Injectable} from '@angular/core';
-import {EventsService} from './events.service';
-import {UtilsService} from './utils.service';
+import { Injectable } from '@angular/core';
+import { EventsService } from './events.service';
+import { UtilsService } from './utils.service';
 import * as gConst from '../gConst';
 import * as gIF from '../gIF';
 
 const UDP_PORT = 18870;
 
-interface idx_t {
-    val: number;
-}
 interface lastAnnce_t {
     ext: number;
     time: number;
@@ -40,7 +36,6 @@ export class PortService {
 
     constructor(private events: EventsService,
                 private utils: UtilsService) {
-
         this.rwBuf.wrBuf = this.msgBuf;
 
         setTimeout(()=>{
@@ -100,7 +95,6 @@ export class PortService {
                 dataHost.extAddr = this.rwBuf.read_double_LE();
                 dataHost.numAttrSets = this.rwBuf.read_uint8();
                 dataHost.numSrcBinds = this.rwBuf.read_uint8();
-                //let ttl = this.read_uint16_LE();
 
                 const duplFlag = this.checkDuplicate(dataHost.extAddr);
                 if(duplFlag === true){
@@ -190,8 +184,7 @@ export class PortService {
                         for(let i = 0; i < rxSet.valsLen; i++) {
                             rxSet.attrVals[i] = this.rwBuf.read_uint8();
                         }
-
-                        this.events.publish('attr_set', JSON.stringify(rxSet));
+                        this.events.publish('attr_set', rxSet);
 
                         param.idx = memIdx + 1;
                         this.udpCmd.param = JSON.stringify(param);
@@ -230,8 +223,7 @@ export class PortService {
                         rxBind.clusterID = this.rwBuf.read_uint16_LE();
                         rxBind.dstExtAddr = this.rwBuf.read_double_LE();
                         rxBind.dstEP = this.rwBuf.read_uint8();
-
-                        this.events.publish('cluster_bind', JSON.stringify(rxBind));
+                        this.events.publish('cluster_bind', rxBind);
 
                         param.idx = memIdx + 1;
                         this.udpCmd.param = JSON.stringify(param);
@@ -395,8 +387,8 @@ export class PortService {
 
         const param: gIF.rdAtIdxParam_t = JSON.parse(this.udpCmd.param);
         this.seqNum = ++this.seqNum % 256;
-
         this.rwBuf.wrIdx = 0;
+
         this.rwBuf.write_uint16_LE(gConst.SL_MSG_READ_ATTR_SET_AT_IDX);
         const lenIdx = this.rwBuf.wrIdx;
         this.rwBuf.write_uint8(0);
@@ -422,8 +414,8 @@ export class PortService {
 
         const param: gIF.rdAtIdxParam_t = JSON.parse(this.udpCmd.param);
         this.seqNum = ++this.seqNum % 256;
-
         this.rwBuf.wrIdx = 0;
+
         this.rwBuf.write_uint16_LE(gConst.SL_MSG_READ_BIND_AT_IDX);
         const lenIdx = this.rwBuf.wrIdx;
         this.rwBuf.write_uint8(0);
@@ -495,11 +487,11 @@ export class PortService {
      * brief
      *
      */
-    udpZclCmd(zclCmd: string) {
+    udpZclCmd(zclCmd: gIF.udpZclReq_t) {
         let cmd: gIF.udpCmd_t = {
             type: gConst.ZCL_CMD,
             retryCnt: 0,
-            param: zclCmd,
+            param: JSON.stringify(zclCmd),
         };
         this.udpCmdQueue.push(cmd);
         if(this.udpCmdFlag == false) {
@@ -538,7 +530,7 @@ export class PortService {
         const dataLen = this.rwBuf.wrIdx - dataStartIdx;
         this.rwBuf.modify_uint8(dataLen, lenIdx);
 
-        this.udpSend(this.rwBuf.wrIdx, req.ip, req .port);
+        this.udpSend(this.rwBuf.wrIdx, req.ip, req.port);
     }
 
     /***********************************************************************************************
@@ -564,6 +556,7 @@ export class PortService {
     private checkDuplicate(ext: number): boolean {
 
         let duplFlag = false;
+
         let i = this.lastAnnceArr.length;
         while(i--){
             if(this.lastAnnceArr[i].ext === ext) {
@@ -583,6 +576,7 @@ export class PortService {
     private cleanAgedAnnce() {
 
         const now = new Date().getTime();
+
         let i = this.lastAnnceArr.length;
         while(i--){
             const dTime = now - this.lastAnnceArr[i].time;

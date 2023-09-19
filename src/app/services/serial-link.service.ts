@@ -1,8 +1,8 @@
 import { Injectable, NgZone, OnDestroy } from '@angular/core';
 import { StorageService } from './storage.service';
-import { PortService } from './port.service';
 import { EventsService } from './events.service';
 import { UtilsService } from './utils.service';
+import { Globals } from './globals';
 import * as gConst from '../gConst';
 import * as gIF from '../gIF';
 
@@ -11,18 +11,12 @@ import * as gIF from '../gIF';
 })
 export class SerialLinkService implements OnDestroy {
 
-    delTest: number;
-
-    setMap = new Map();
-
     constructor(private events: EventsService,
-                private port: PortService,
                 private storage: StorageService,
                 private utils: UtilsService,
+                private globs: Globals,
                 private ngZone: NgZone) {
-        setTimeout(()=>{
-            this.initApp();
-        }, 100);
+
     }
 
     /***********************************************************************************************
@@ -37,14 +31,12 @@ export class SerialLinkService implements OnDestroy {
 
         this.events.subscribe('attr_set', (attrSet)=>{
             this.ngZone.run(()=>{
-                this.parseAttrSet(JSON.parse(attrSet));
+                this.parseAttrSet(attrSet);
             });
         });
         this.events.subscribe('cluster_bind', (bind)=>{
-            this.addBind(JSON.parse(bind));
+            this.addBind(bind);
         });
-
-        //this.port.listComPorts();
 
         setTimeout(()=>{
             this.cleanAgedAttribs();
@@ -65,16 +57,6 @@ export class SerialLinkService implements OnDestroy {
      */
     ngOnDestroy() {
         // ---
-    }
-
-    /***********************************************************************************************
-     * fn          closeSocket
-     *
-     * brief
-     *
-     */
-    closeSocket() {
-        this.port.closeSocket();
     }
 
     /***********************************************************************************************
@@ -179,7 +161,7 @@ export class SerialLinkService implements OnDestroy {
     }
 
     /***********************************************************************************************
-     * fn          addSrcBinds
+     * fn          addBind
      *
      * brief
      *
@@ -249,26 +231,6 @@ export class SerialLinkService implements OnDestroy {
         setTimeout(()=>{
             this.cleanAgedBinds();
         }, 60000);
-    }
-
-    /***********************************************************************************************
-     * fn          wrBinds
-     *
-     * brief
-     *
-     */
-    public wrBind(bind: string) {
-        this.events.publish('wr_bind', bind);
-    }
-
-    /***********************************************************************************************
-     * fn          udpZclCmd
-     *
-     * brief
-     *
-     */
-    public udpZclCmd(zclCmd: string) {
-        this.events.publish('zcl_cmd', zclCmd);
     }
 
     /***********************************************************************************************
@@ -658,7 +620,7 @@ export class SerialLinkService implements OnDestroy {
             setVals: setVals,
         };
         key = this.attrSetKey(hostedSet);
-        this.setMap.set(key, hostedSet);
+        this.globs.setMap.set(key, hostedSet);
 
         return attrSpecs;
     }
@@ -698,10 +660,10 @@ export class SerialLinkService implements OnDestroy {
     private cleanAgedSets() {
         let diff: number;
         let now = Math.round(Date.now() / 1000);
-        for(let [key, val] of this.setMap) {
+        for(let [key, val] of this.globs.setMap) {
             diff = now - val.timestamp;
             if(diff > gConst.SET_TTL) {
-                this.setMap.delete(key);
+                this.globs.setMap.delete(key);
             }
         }
         setTimeout(()=>{

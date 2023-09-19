@@ -1,5 +1,4 @@
 import { Component, Inject, OnInit, AfterViewInit, NgZone, HostListener } from '@angular/core';
-import { SerialLinkService } from '../services/serial-link.service';
 import { EventsService } from '../services/events.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UtilsService } from '../services/utils.service';
@@ -32,7 +31,6 @@ export class SSR implements OnInit, AfterViewInit {
 
     constructor(private dialogRef: MatDialogRef<SSR>,
                 @Inject(MAT_DIALOG_DATA) public dlgData: any,
-                private serialLink: SerialLinkService,
                 private events: EventsService,
                 public utils: UtilsService,
                 private ngZone: NgZone) {
@@ -124,7 +122,7 @@ export class SSR implements OnInit, AfterViewInit {
         zclCmd.cmd[0] = 0x11; // cluster spec cmd, not manu spec, client to srv dir, disable dflt rsp
         zclCmd.cmd[1] = 0x00; // seq num -> not used
         zclCmd.cmd[2] = state;  // ON/OFF command
-        this.serialLink.udpZclCmd(JSON.stringify(zclCmd));
+        this.events.publish('zcl_cmd', zclCmd);
     }
 
 

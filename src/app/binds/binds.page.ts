@@ -1,5 +1,6 @@
 import { Component, Inject, NgZone, AfterViewInit, HostListener } from '@angular/core';
 import { SerialLinkService } from '../services/serial-link.service';
+import { EventsService } from '../services/events.service';
 import { StorageService } from '../services/storage.service';
 import { UtilsService } from '../services/utils.service';
 import { Validators, FormControl } from '@angular/forms';
@@ -44,6 +45,7 @@ export class EditBinds implements AfterViewInit {
     constructor(private dialogRef: MatDialogRef<EditBinds>,
                 @Inject(MAT_DIALOG_DATA) public dlgData: any,
                 private serial: SerialLinkService,
+                private events: EventsService,
                 private storage: StorageService,
                 private utils: UtilsService,
                 private ngZone: NgZone) {
@@ -257,12 +259,12 @@ export class EditBinds implements AfterViewInit {
                 this.bindSrc.dstExtAddr = 0;
                 this.bindSrc.dstEP = 0;
             }
-            this.serial.wrBind(JSON.stringify(this.bindSrc));
+            this.events.publish('wr_bind', JSON.stringify(this.bindSrc));
         }
     }
 
     /***********************************************************************************************
-     * fn          wrBindLoc
+     * fn          wrBindName
      *
      * brief
      *

@@ -89,14 +89,14 @@
         <div class="actuators-header">
             Actuators
         </div>
-        <div class="on-off-all-wrap">
+        <div class="on-off-free-wrap">
             <div class="on-off-list"
                 cdkDropList
                 #freeList="cdkDropList"
                 [cdkDropListConnectedTo]="[usedList]"
-                [cdkDropListData]="on_off_all"
+                [cdkDropListData]="on_off_free"
                 (cdkDropListDropped)="freeDrop($event)">
-                <div *ngFor="let on_off of on_off_all"
+                <div *ngFor="let on_off of on_off_free"
                     class="on-off-box"
                     cdkDrag
                     [cdkDragDisabled]='!on_off.valid'

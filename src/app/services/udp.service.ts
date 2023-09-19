@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { SerialLinkService } from './serial-link.service';
-import { PortService } from './port.service';
 import { UtilsService } from './utils.service';
+import { Globals } from './globals';
+import { EventsService } from './events.service';
 
 import * as gConst from '../gConst';
 import * as gIF from '../gIF';
@@ -14,18 +14,16 @@ const ANNCE_TMO = 3000;
 })
 export class UdpService {
 
-    //private nwk;
     private dgram;
     udpSocket;
 
     msgBuf = window.nw.Buffer.alloc(1024);
     rwBuf = new gIF.rwBuf_t();
 
-    constructor(private serial: SerialLinkService,
-                private port: PortService,
+    constructor(private events: EventsService,
+                private globs: Globals,
                 private utils: UtilsService) {
         this.rwBuf.wrBuf = this.msgBuf;
-        //this.nwk = window.nw.require('network');
         this.dgram = window.nw.require('dgram');
         this.udpSocket = this.dgram.createSocket('udp4');
         this.udpSocket.on('message', (msg, rinfo)=>{
@@ -66,7 +64,6 @@ export class UdpService {
     public udpOnMsg(msg, rem) {
 
         this.rwBuf.rdBuf = msg;
-        //this.rwBuf.wrBuf = this.msgBuf;
         this.rwBuf.rdIdx = 0;
         this.rwBuf.wrIdx = 0;
 
@@ -95,7 +92,7 @@ export class UdpService {
                 const doneIdx = this.rwBuf.wrIdx;
                 this.rwBuf.write_uint8(1); // done field
                 let valIdx = 0;
-                for(let attrSet of this.serial.setMap.values()) {
+                for(let attrSet of this.globs.setMap.values()) {
                     if(attrSet.clusterID == gConst.CLUSTER_ID_GEN_ON_OFF) {
                         if(valIdx >= startIdx) {
                             numVals++;
@@ -139,7 +136,7 @@ export class UdpService {
                 let doneIdx = this.rwBuf.wrIdx;
                 this.rwBuf.write_uint8(1);
                 let valIdx = 0;
-                for(let attrSet of this.serial.setMap.values()) {
+                for(let attrSet of this.globs.setMap.values()) {
                     if(attrSet.clusterID == gConst.CLUSTER_ID_MS_TEMPERATURE_MEASUREMENT) {
                         if(valIdx >= startIdx) {
                             numVals++;
@@ -181,7 +178,7 @@ export class UdpService {
                 let doneIdx = this.rwBuf.wrIdx;
                 this.rwBuf.write_uint8(1);
                 let valIdx = 0;
-                for(let attrSet of this.serial.setMap.values()) {
+                for(let attrSet of this.globs.setMap.values()) {
                     if(attrSet.clusterID == gConst.CLUSTER_ID_MS_RH_MEASUREMENT) {
                         if(valIdx >= startIdx) {
                             numVals++;
@@ -225,29 +222,12 @@ export class UdpService {
      *
      */
     bridgeAnnce() {
-        if(this.port.bcastIP){
-            this.msgBuf.writeUInt16LE(gConst.BRIDGE_ID_RSP, 0);
-            this.udpSocket.send(this.msgBuf.subarray(0, 2), 0, 2, UDP_PORT, this.port.bcastIP, (err)=>{
-                if(err) {
-                    console.log('UDP ERR: ' + JSON.stringify(err));
-                }
-            });
-        }
-        /*
-        this.nwk.get_gateway_ip((err, ip)=>{
-            if(!err){
-                const bcastIP  = ip.split('.');
-                bcastIP[3] = '255';
-                const ipStr = bcastIP.join('.');
-                this.msgBuf.writeUInt16LE(gConst.BRIDGE_ID_RSP, 0);
-                this.udpSocket.send(this.msgBuf.subarray(0, 2), 0, 2, UDP_PORT, ipStr, (err)=>{
-                    if(err) {
-                        console.log('UDP ERR: ' + JSON.stringify(err));
-                    }
-                });
+        this.msgBuf.writeUInt16LE(gConst.BRIDGE_ID_RSP, 0);
+        this.udpSocket.send(this.msgBuf.subarray(0, 2), 0, 2, UDP_PORT, '255.255.255.255', (err)=>{
+            if(err) {
+                console.log('UDP ERR: ' + JSON.stringify(err));
             }
-        })
-        */
+        });
         setTimeout(()=>{
             this.bridgeAnnce();
         }, ANNCE_TMO);
