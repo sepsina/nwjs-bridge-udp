@@ -437,11 +437,11 @@ export class PortService {
      * brief
      *
      */
-    wrBind(bind: string) {
+    wrBind(bind: gIF.hostedBind_t) {
         let cmd: gIF.udpCmd_t = {
             type: gConst.WR_BIND,
             retryCnt: gConst.RD_HOST_RETRY_CNT,
-            param: bind,
+            param: JSON.stringify(bind),
         };
         this.udpCmdQueue.push(cmd);
         if(this.udpCmdFlag == false) {

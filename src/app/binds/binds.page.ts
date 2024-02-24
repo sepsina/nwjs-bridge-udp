@@ -259,7 +259,7 @@ export class EditBinds implements AfterViewInit {
                 this.bindSrc.dstExtAddr = 0;
                 this.bindSrc.dstEP = 0;
             }
-            this.events.publish('wr_bind', JSON.stringify(this.bindSrc));
+            this.events.publish('wr_bind', this.bindSrc);
         }
     }
 
